@@ -1,5 +1,4 @@
 import express from 'express'
-// import bodyParser from 'body-parser'
 import cors from 'cors'
 import db from './db.js'
 
@@ -41,7 +40,7 @@ app.post('/RescueMoney/add', async (req, res) => {
   try {
     // 檢查名稱是否重複
     db.rescuemoney.find({}, { _id: 0 }, async function (err, rescuemoney) {
-      if (!err && rescuemoney.length > 0) {
+      if (!err) {
         let exist = false
         for (let i = 0; i < rescuemoney.length; i++) {
           if (rescuemoney[i].player === req.body.player) {
@@ -54,19 +53,15 @@ app.post('/RescueMoney/add', async (req, res) => {
           res.send({ success: false, message: '名稱重複' })
         } else {
           // 新增
-          const result = await db.rescuemoney.create(
+          await db.rescuemoney.create(
             {
               player: req.body.player,
               money: req.body.money
             }
           )
-          console.log(result)
           res.status(200)
           res.send({ success: true, message: '' })
         }
-      } else {
-        res.status(400)
-        res.send({ success: false, message: '資料庫沒有資料' })
       }
     })
   } catch (error) {
@@ -92,7 +87,6 @@ app.get('/RescueMoney/SearchAll', async (req, res) => {
       }
     })
   } catch (error) {
-    // 找不到東西
     res.status(404)
     res.send({ success: false, message: '找不到' })
   }
@@ -125,12 +119,109 @@ app.get('/RescueMoney/Search/:player', async (req, res) => {
       }
     })
   } catch (error) {
-    // 找不到東西
     res.status(404)
     res.send({ success: false, message: '找不到' })
   }
 })
-
+// 檢查是否為第一
+app.get('/RescueMoney/IsTopFive/:player', async (req, res) => {
+  try {
+    db.rescuemoney.find({}, { _id: 0 }, function (err, rescuemoney) {
+      if (!err && rescuemoney.length > 0) {
+        rescuemoney.sort(function (a, b) {
+          return b.money - a.money
+        })
+        try {
+          res.status(200)
+          let topFive = false
+          for (let i = 0; i < 5; i++) {
+            if (rescuemoney[i].player === req.params.player) {
+              topFive = true
+              break
+            }
+          }
+          res.send({ success: true, message: topFive })
+        } catch (error) {
+          res.status(404)
+          res.send({ success: false, message: '找不到資料' })
+        }
+      } else {
+        res.status(400)
+        res.send({ success: false, message: '資料庫沒有資料' })
+      }
+    })
+  } catch (error) {
+    res.status(404)
+    res.send({ success: false, message: '找不到' })
+  }
+})
+/* Bonus */
+// 查詢
+app.get('/Bonus/SearchAll', async (req, res) => {
+  try {
+    let amount = 0
+    db.rescuemoney.find({}, { _id: 0 }, function (err, rescuemoney) {
+      if (!err) {
+        amount = rescuemoney.length
+        db.bonus.find({}, { _id: 0 }, function (err, bonus) {
+          if (!err && bonus.length > 0) {
+            res.status(200)
+            const result = {
+              jackpot: bonus[0].jackpot,
+              amount: amount
+            }
+            res.send({ success: true, message: '所有資料', result })
+          } else {
+            res.status(400)
+            res.send({ success: false, message: '資料庫沒有資料' })
+          }
+        })
+      }
+    })
+  } catch (error) {
+    res.status(404)
+    res.send({ success: false, message: '找不到' })
+  }
+})
+// 修改
+app.patch('/Bonus/Update', async (req, res) => {
+  if (req.headers['content-type'] !== 'application/json') {
+    res.status(400)
+    res.send({ success: false, message: '格式不符' })
+    return
+  }
+  if (req.body.jackpot === undefined) {
+    res.status(400)
+    res.send({ success: false, message: '更新欄位不符' })
+    return
+  } else if (isNaN(req.body.jackpot)) {
+    res.status(400)
+    res.send({ success: false, message: 'jackpot不是數字' })
+    return
+  }
+  try {
+    db.bonus.find({}, async function (err, bonus) {
+      if (!err && bonus.length > 0) {
+        await db.bonus.findByIdAndUpdate(bonus[0]._id, { jackpot: req.body.jackpot }, { new: true })
+        res.status(200)
+        res.send({ success: true, message: '修改成功' })
+      } else {
+        res.status(400)
+        res.send({ success: false, message: '資料庫沒有資料' })
+      }
+    })
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const key = Object.keys(error.errors)[0]
+      const message = error.errors[key].message
+      res.status(400)
+      res.send({ success: false, message })
+    } else {
+      res.status(500)
+      res.send({ success: false, message: '伺服器錯誤' })
+    }
+  }
+})
 app.listen(process.env.PORT, () => {
   console.log('網頁伺服器已啟動')
   console.log('http://localhost:3000')

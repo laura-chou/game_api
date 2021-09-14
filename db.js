@@ -6,7 +6,8 @@ dotenv.config()
 
 const Schema = mongoose.Schema
 mongoose.set('useCreateIndex', true)
-mongoose.connect(process.env.DBURL, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.set('useFindAndModify', false)
+mongoose.connect(process.env.DBURL, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
 mongoose.plugin(beautifyUnique)
 
 const rescuemoneySchema = new Schema({
@@ -18,6 +19,15 @@ const rescuemoneySchema = new Schema({
   money: {
     type: Number,
     require: [true, '金錢必填']
+  }
+}, {
+  versionKey: false
+})
+
+const bonusSchema = new Schema({
+  jackpot: {
+    type: Number,
+    require: [true, '獎金必填']
   }
 }, {
   versionKey: false
@@ -52,12 +62,14 @@ const hitzombiesSchema = new Schema({
 })
 
 const rescuemoney = mongoose.model(process.env.COLLECTION_RESCUEMONEY, rescuemoneySchema)
+const bonus = mongoose.model(process.env.COLLECTION_BONUS, bonusSchema)
 const turnchess = mongoose.model(process.env.COLLECTION_TURNCHESS, turnchessSchema)
 const hitzombies = mongoose.model(process.env.COLLECTION_HITZOMBIES, hitzombiesSchema)
 const connection = mongoose.connection
 
 export default {
   rescuemoney,
+  bonus,
   turnchess,
   hitzombies,
   connection
