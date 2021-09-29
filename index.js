@@ -26,7 +26,7 @@ app.use(cors({
 }))
 /* RescueMoney */
 // 新增
-app.post('/RescueMoney/add', async (req, res) => {
+app.post('/RescueMoney', async (req, res) => {
   if (req.headers['content-type'] !== 'application/json') {
     res.status(400)
     res.send({ success: false, message: '格式不符' })
@@ -59,20 +59,20 @@ app.post('/RescueMoney/add', async (req, res) => {
               money: req.body.money
             }
           )
-          res.status(200)
-          res.send({ success: true, message: '' })
+          res.status(201)
+          res.send({ success: true, message: '新增成功' })
         }
       }
     })
   } catch (error) {
     const key = Object.keys(error.errors)[0]
     const message = error.errors[key].message
-    res.status(400)
-    res.send({ success: false, message })
+    res.status(404)
+    res.send({ success: false, message: message })
   }
 })
 // 查詢
-app.get('/RescueMoney/SearchAll', async (req, res) => {
+app.get('/RescueMoney', async (req, res) => {
   try {
     db.rescuemoney.find({}, { _id: 0 }, function (err, rescuemoney) {
       if (!err && rescuemoney.length > 0) {
@@ -83,16 +83,18 @@ app.get('/RescueMoney/SearchAll', async (req, res) => {
         res.send({ success: true, message: '所有資料', rescuemoney })
       } else {
         res.status(400)
-        res.send({ success: false, message: '資料庫沒有資料' })
+        res.send({ success: false, message: '沒有資料' })
       }
     })
   } catch (error) {
+    const key = Object.keys(error.errors)[0]
+    const message = error.errors[key].message
     res.status(404)
-    res.send({ success: false, message: '找不到' })
+    res.send({ success: false, message: message })
   }
 })
 // 查詢 player
-app.get('/RescueMoney/Search/:player', async (req, res) => {
+app.get('/RescueMoney/:player', async (req, res) => {
   try {
     db.rescuemoney.find({}, { _id: 0 }, function (err, rescuemoney) {
       if (!err && rescuemoney.length > 0) {
@@ -108,22 +110,24 @@ app.get('/RescueMoney/Search/:player', async (req, res) => {
             rank: index + 1
           }]
           res.status(200)
-          res.send({ success: true, message: '', rescuemoney })
+          res.send({ success: true, message: '玩家資料', rescuemoney })
         } catch (error) {
           res.status(404)
-          res.send({ success: false, message: '找不到資料' })
+          res.send({ success: false, message: '找不到' })
         }
       } else {
         res.status(400)
-        res.send({ success: false, message: '資料庫沒有資料' })
+        res.send({ success: false, message: '沒有資料' })
       }
     })
   } catch (error) {
+    const key = Object.keys(error.errors)[0]
+    const message = error.errors[key].message
     res.status(404)
-    res.send({ success: false, message: '找不到' })
+    res.send({ success: false, message: message })
   }
 })
-// 檢查是否為第一
+// 檢查是否為前五名
 app.get('/RescueMoney/IsTopFive/:player', async (req, res) => {
   try {
     db.rescuemoney.find({}, { _id: 0 }, function (err, rescuemoney) {
@@ -143,21 +147,23 @@ app.get('/RescueMoney/IsTopFive/:player', async (req, res) => {
           res.send({ success: true, message: topFive })
         } catch (error) {
           res.status(404)
-          res.send({ success: false, message: '找不到資料' })
+          res.send({ success: false, message: '找不到' })
         }
       } else {
         res.status(400)
-        res.send({ success: false, message: '資料庫沒有資料' })
+        res.send({ success: false, message: '沒有資料' })
       }
     })
   } catch (error) {
+    const key = Object.keys(error.errors)[0]
+    const message = error.errors[key].message
     res.status(404)
-    res.send({ success: false, message: '找不到' })
+    res.send({ success: false, message: message })
   }
 })
 /* Bonus */
 // 查詢
-app.get('/Bonus/SearchAll', async (req, res) => {
+app.get('/Bonus', async (req, res) => {
   try {
     let amount = 0
     db.rescuemoney.find({}, { _id: 0 }, function (err, rescuemoney) {
@@ -173,7 +179,7 @@ app.get('/Bonus/SearchAll', async (req, res) => {
             res.send({ success: true, message: '所有資料', result })
           } else {
             res.status(400)
-            res.send({ success: false, message: '資料庫沒有資料' })
+            res.send({ success: false, message: '沒有資料' })
           }
         })
       }
@@ -184,7 +190,7 @@ app.get('/Bonus/SearchAll', async (req, res) => {
   }
 })
 // 修改
-app.patch('/Bonus/Update', async (req, res) => {
+app.patch('/Bonus', async (req, res) => {
   if (req.headers['content-type'] !== 'application/json') {
     res.status(400)
     res.send({ success: false, message: '格式不符' })
@@ -207,19 +213,14 @@ app.patch('/Bonus/Update', async (req, res) => {
         res.send({ success: true, message: '修改成功' })
       } else {
         res.status(400)
-        res.send({ success: false, message: '資料庫沒有資料' })
+        res.send({ success: false, message: '沒有資料' })
       }
     })
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const key = Object.keys(error.errors)[0]
-      const message = error.errors[key].message
-      res.status(400)
-      res.send({ success: false, message })
-    } else {
-      res.status(500)
-      res.send({ success: false, message: '伺服器錯誤' })
-    }
+    const key = Object.keys(error.errors)[0]
+    const message = error.errors[key].message
+    res.status(404)
+    res.send({ success: false, message: message })
   }
 })
 app.listen(process.env.PORT, () => {
