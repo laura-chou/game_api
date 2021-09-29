@@ -1,5 +1,5 @@
-# 遊戲 Api
-## 搶救荷包大作戰
+# Game Api
+### 搶救荷包大作戰
 ### RescueMoney Collection
 #### 資料欄位
 + `player` 玩家名稱
@@ -133,3 +133,6 @@
     "message": "修改成功"
   }
   ```
+---
+### Apiary
+#### https://gamesapi5.docs.apiary.io/
