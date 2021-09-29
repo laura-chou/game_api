@@ -1,5 +1,4 @@
-# Game Api
-### 搶救荷包大作戰
+# 搶救荷包大作戰
 ### RescueMoney Collection
 #### 資料欄位
 + `player` 玩家名稱
