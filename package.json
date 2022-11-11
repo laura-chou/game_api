@@ -3,9 +3,6 @@
   "name": "games_api",
   "version": "1.0.0",
   "description": "",
-  "engines": {
-    "node": "14.0.0"
-  },
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
