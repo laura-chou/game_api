@@ -1,5 +1,5 @@
 import rescueMoney from '../models/rescue-money.js'
-import { getDate, sendResponse, isNullOrEmpty } from '../js/common.js'
+import { getDate, sendResponse, isNullOrEmpty, isTypeString, isTypeInteger } from '../js/common.js'
 
 export const insertPlayer = async (req, res) => {
   if (req.headers['content-type'] !== 'application/json') {
@@ -10,7 +10,11 @@ export const insertPlayer = async (req, res) => {
     sendResponse(res, 400, false, 'json objects incorrect')
     return
   }
-  if (isNaN(req.body.money)) {
+  if (!isTypeString(req.body.player)) {
+    sendResponse(res, 400, false, 'player is not a string')
+    return
+  }
+  if (!isTypeInteger(req.body.money)) {
     sendResponse(res, 400, false, 'money is not a number')
     return
   }

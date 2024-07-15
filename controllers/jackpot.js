@@ -1,6 +1,6 @@
 import jackpot from '../models/jackpot.js'
 import { getTotalPlayer } from './rescue-money.js'
-import { getDate, sendResponse, isNullOrEmpty } from '../js/common.js'
+import { getDate, sendResponse, isNullOrEmpty, isTypeBoolean } from '../js/common.js'
 
 export const getJackPot = async (req, res) => {
   try {
@@ -27,6 +27,10 @@ export const updateJackPot = async (req, res) => {
   }
   if (isNullOrEmpty(req.body.win)) {
     sendResponse(res, 400, false, 'json objects incorrect')
+    return
+  }
+  if (!isTypeBoolean(req.body.win)) {
+    sendResponse(res, 400, false, 'win is not a boolean.')
     return
   }
   try {

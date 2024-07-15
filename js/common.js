@@ -25,3 +25,15 @@ export const sendResponse = (res, status, success, message, data = null) => {
 export const isNullOrEmpty = (value) => {
   return value === null || value === undefined || value.length === 0
 }
+
+export const isTypeBoolean = (value) => {
+  return typeof value === 'boolean'
+}
+
+export const isTypeString = (value) => {
+  return typeof value === 'string'
+}
+
+export const isTypeInteger = (value) => {
+  return typeof value === 'number' && Number.isInteger(value)
+}
