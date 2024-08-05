@@ -1,0 +1,27 @@
+[
+  {
+    "statusCode": 200,
+    "situation": "noData",
+    "message": "No data."
+  },
+  {
+    "statusCode": 500,
+    "situation": "server",
+    "message": "Server error."
+  },
+  {
+    "statusCode": 400,
+    "situation": "contentType",
+    "message": "Invalid content-type. Expected application/json."
+  },
+  {
+    "statusCode": 400,
+    "situation": "jsonKey",
+    "message": "Incorrect json key."
+  },
+  {
+    "statusCode": 400,
+    "situation": "jsonValue",
+    "message": "Invalid json value type."
+  }
+]
