@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import rescueMoneyRoutes from './routes/rescue-money.js'
 import jackpotRoutes from './routes/jackpot.js'
 import indexRoutes from './routes/index.js'
+import { sendResponse, isNullOrEmpty, convertToBool } from './js/common.js'
 import { logger } from './js/logger.js'
 import './db.js'
 
@@ -16,18 +17,22 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({
   origin (origin, callback) {
-    logger.info(`origin: ${origin}`)
-    if (process.env.ALLOW_CORS === 'true') {
-      callback(null, true)
-    } else if (whitelist.includes(origin)) {
+    if (whitelist.includes(origin) || !convertToBool(process.env.RELEASE)) {
+      logger.info(`origin: ${origin}`)
       callback(null, true)
     } else {
-      callback(new Error('Not allowed'), false)
+      const msg = 'Not allowed by CORS'
+      logger.error(`origin: ${origin} ${msg}`)
+      callback(new Error(msg), false)
     }
   },
   credentials: true
 }))
-app.use((req, res, next) => {
+app.use((error, req, res, next) => {
+  if (!isNullOrEmpty(error.message)) {
+    sendResponse(res, 403, 'error', 'CORS policy does not allow access from this origin.')
+    return
+  }
   logger.info(`Path: ${req.originalUrl}`)
   next()
 })
