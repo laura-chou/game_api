@@ -55,5 +55,5 @@ export const isTypeInteger = (value) => {
   return typeof value === 'number' && Number.isInteger(value)
 }
 export const convertToBool = (value) => {
-  return !!(value === 'true' || value === '1')
+  return value === 'true' || value === '1'
 }

@@ -17,7 +17,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({
   origin (origin, callback) {
-    if (whitelist.includes(origin) || !convertToBool(process.env.RELEASE)) {
+    if (whitelist.includes(origin) || convertToBool(process.env.ALLOW_CORS)) {
       logger.info(`origin: ${origin}`)
       callback(null, true)
     } else {

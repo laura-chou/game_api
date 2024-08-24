@@ -19,7 +19,7 @@ const getDailyRotateFile = (level, fileName) => {
     level: level,
     filename: `${fileName}.log`,
     datePattern: 'YYYY-MM-DD',
-    dirname: 'Logs/%DATE%/',
+    dirname: 'logs/%DATE%/',
     zippedArchive: true,
     maxSize: '20m',
     maxFiles: '14d'
@@ -29,15 +29,12 @@ const getDailyRotateFile = (level, fileName) => {
 export const logger = winston.createLogger({
   format: formatSetting,
   transports: [
-    new DailyRotateFile(getDailyRotateFile('info', 'Log')),
-    new DailyRotateFile(getDailyRotateFile('error', 'ErrorLog'))
+    new DailyRotateFile(getDailyRotateFile('info', 'log')),
+    new DailyRotateFile(getDailyRotateFile('error', 'errorLog')),
+    new winston.transports.Console()
   ]
 })
 
 export const logFunctionMsg = (name, message) => {
   return `function ${name}: ${message}`
-}
-
-export const logConstMsg = (name, message) => {
-  return `const ${name}: ${message}`
 }
