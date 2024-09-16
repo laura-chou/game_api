@@ -1,5 +1,5 @@
-import mongoose from 'mongoose'
 import 'dotenv/config'
+import mongoose from 'mongoose'
 
 const Schema = mongoose.Schema
 

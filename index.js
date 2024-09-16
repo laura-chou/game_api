@@ -1,14 +1,12 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import rescueMoneyRoutes from './routes/rescue-money.js'
 import jackpotRoutes from './routes/jackpot.js'
 import indexRoutes from './routes/index.js'
 import { sendResponse, isNullOrEmpty, convertToBool } from './js/common.js'
 import { logger } from './js/logger.js'
 import './db.js'
-
-dotenv.config()
 
 const app = express()
 const whitelist = process.env.WHITELIST.split(',')

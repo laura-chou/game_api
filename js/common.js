@@ -1,7 +1,5 @@
+import 'dotenv/config'
 import { promises as fs } from 'fs'
-import dotenv from 'dotenv'
-
-dotenv.config()
 
 let noDataRes, serverRes, contentTypeRes, jsonKeyRes, jsonValueRes
 
