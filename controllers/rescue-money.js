@@ -59,11 +59,6 @@ export const insertPlayer = async (req, res) => {
     return
   }
   try {
-    let data = await getPlayersData()
-    if (data.length > 0) {
-      data = getResultData(data).slice(0, 5)
-    }
-    const isPlayerInTop5 = data.some(item => item.players.includes(req.body.player))
     const insertData = {
       player: req.body.player,
       money: req.body.money,
@@ -72,6 +67,11 @@ export const insertPlayer = async (req, res) => {
     rescueMoney.create(insertData)
       .then(async () => {
         logger.info(logFunctionMsg(insertPlayer.name, 'success'))
+        let data = await getPlayersData()
+        if (data.length > 0) {
+          data = getResultData(data).slice(0, 5)
+        }
+        const isPlayerInTop5 = data.some(item => item.players.includes(req.body.player))
         res.status(200).send({
           status: 'success',
           message: '',
