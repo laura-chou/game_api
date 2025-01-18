@@ -1,6 +1,6 @@
 import rescueMoney from '../models/rescue-money.js'
 import {
-  nowDate, sendResponse,
+  getNowDate, sendResponse,
   isNullOrEmpty, isTypeString, isTypeInteger,
   serverRes, contentTypeRes, jsonKeyRes, jsonValueRes, noDataRes
 } from '../js/common.js'
@@ -62,7 +62,7 @@ export const insertPlayer = async (req, res) => {
     const insertData = {
       player: req.body.player,
       money: req.body.money,
-      date: nowDate
+      date: getNowDate()
     }
     rescueMoney.create(insertData)
       .then(async () => {

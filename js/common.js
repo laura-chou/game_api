@@ -20,16 +20,18 @@ init()
 
 export { noDataRes, serverRes, contentTypeRes, jsonKeyRes, jsonValueRes }
 
-export const nowDate = new Intl.DateTimeFormat('zh-TW', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-  hourCycle: 'h24',
-  timeZone: 'Asia/Taipei'
-}).format(new Date())
+export const getNowDate = () => {
+  return new Intl.DateTimeFormat('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h24',
+    timeZone: 'Asia/Taipei'
+  }).format(new Date())
+}
 
 export const sendResponse = (res, statusCode, status, message, data = null) => {
   const response = {

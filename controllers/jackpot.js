@@ -2,7 +2,7 @@
 import jackpot from '../models/jackpot.js'
 import { getTotalPlayers } from './rescue-money.js'
 import {
-  nowDate, sendResponse,
+  getNowDate, sendResponse,
   isNullOrEmpty, isTypeBoolean,
   serverRes, contentTypeRes, jsonKeyRes, jsonValueRes, noDataRes
 } from '../js/common.js'
@@ -63,7 +63,7 @@ export const updateJackPot = async (req, res) => {
     }
     const data = {
       bonus: updateBonus,
-      date: nowDate
+      date: getNowDate()
     }
     await jackpot.updateOne({}, data, { new: true })
       .then(() => {
