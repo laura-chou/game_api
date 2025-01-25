@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { promises as fs } from 'fs'
+import moment from 'moment-timezone'
 
 let noDataRes, serverRes, contentTypeRes, jsonKeyRes, jsonValueRes
 
@@ -21,16 +22,7 @@ init()
 export { noDataRes, serverRes, contentTypeRes, jsonKeyRes, jsonValueRes }
 
 export const getNowDate = () => {
-  return new Intl.DateTimeFormat('zh-TW', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hourCycle: 'h24',
-    timeZone: 'Asia/Taipei'
-  }).format(new Date())
+  return moment().tz('Asia/Taipei').format()
 }
 
 export const sendResponse = (res, statusCode, status, message, data = null) => {
