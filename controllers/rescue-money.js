@@ -1,7 +1,7 @@
 import rescueMoney from '../models/rescue-money.js'
 import {
   getNowDate, sendResponse,
-  isNullOrEmpty, isTypeString, isTypeInteger,
+  isNullOrEmpty, isTypeString,
   serverRes, contentTypeRes, jsonKeyRes, jsonValueRes, noDataRes
 } from '../js/common.js'
 import { logger, logFunctionMsg } from '../js/logger.js'
@@ -46,14 +46,8 @@ export const insertPlayer = async (req, res) => {
     sendResponse(res, jsonKeyRes.statusCode, 'error', jsonKeyRes.message)
     return
   }
-  if (!isTypeString(req.body.player)) {
+  if (!isTypeString(req.body.player) || !isTypeString(req.body.money)) {
     const msg = `${jsonValueRes.message} Expected string.`
-    logger.error(logFunctionMsg(insertPlayer.name, msg))
-    sendResponse(res, jsonValueRes.statusCode, 'error', msg)
-    return
-  }
-  if (!isTypeInteger(req.body.money)) {
-    const msg = `${jsonValueRes.message} Expected integer.`
     logger.error(logFunctionMsg(insertPlayer.name, msg))
     sendResponse(res, jsonValueRes.statusCode, 'error', msg)
     return
@@ -131,19 +125,26 @@ export const getTotalPlayer = async () => {
 }
 
 const getResultData = (data) => {
-  let index = 0
-  return data.reduce((res, current) => {
+  const sequence = data.reduce((res, current) => {
     const result = res.find(e => e.money === current.money)
     if (result) {
       result.players = [...result.players, current.player]
       return res
     } else {
-      index++
       return [...res, {
-        rank: index,
         money: current.money,
         players: [current.player]
       }]
     }
   }, [])
+
+  sequence.sort((a, b) => {
+    return parseFloat(b.money) - parseFloat(a.money)
+  })
+
+  sequence.forEach((item, index) => {
+    item.rank = index + 1
+  })
+
+  return sequence
 }

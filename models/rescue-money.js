@@ -9,7 +9,7 @@ const rescueMoneySchema = new Schema({
     require: true
   },
   money: {
-    type: Number,
+    type: String,
     require: true
   },
   date: {
