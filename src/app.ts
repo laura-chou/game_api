@@ -1,4 +1,5 @@
 import "dotenv/config"
+import "./db"
 import  express, { Express, Request, Response, NextFunction } from "express"
 import cors, { CorsOptions } from "cors"
 import { convertToBool, isNullOrEmpty } from "./common"
@@ -37,7 +38,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
 })
 
 router.forEach( route => {
-  app.use(route.getRouter())
+  app.use(route.getPrefix(), route.getRouter())
 })
 
 app.listen(process.env.PORT, () => {

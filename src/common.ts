@@ -45,8 +45,9 @@ const serverRes: ApiResponse = getResponse('SERVER_ERROR')
 const contentTypeRes: ApiResponse = getResponse('INVALID_CONTENT_TYPE')
 const jsonKeyRes: ApiResponse = getResponse('INVALID_JSON_KEY')
 const jsonValueRes: ApiResponse = getResponse('INVALID_JSON_FORMAT')
+const envErrorMessage: string = "environment variable is not setting"
 
-export { noDataRes, serverRes, contentTypeRes, jsonKeyRes, jsonValueRes }
+export { noDataRes, serverRes, contentTypeRes, jsonKeyRes, jsonValueRes, envErrorMessage }
 
 export const getNowDate = (): string => {
   return moment().tz('Asia/Taipei').format()
