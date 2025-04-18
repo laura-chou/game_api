@@ -7,11 +7,11 @@ abstract class Route {
   protected abstract setRoutes(): void
   protected abstract setPrefix(): void
 
-  public getRouter() {
+  public getRouter(): Router {
     return this.router
   }
 
-  public getPrefix() {
+  public getPrefix(): string {
     return this.prefix;
   }
 }

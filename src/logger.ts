@@ -1,12 +1,12 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file'
+import { isNullOrEmpty } from './common'
 const { combine, timestamp, printf } = winston.format
 
-enum LogLevel {
+export const enum LogLevel {
   INFO = 'info',
   ERROR = 'error',
-  WARN = 'warn',
-  DEBUG = 'debug'
+  WARN = 'warn'
 }
 
 interface DailyRotateFileOption {
@@ -36,7 +36,7 @@ const getDailyRotateFile = (level: LogLevel, fileName: string): DailyRotateFileO
   }
 }
 
-export const logger: winston.Logger = winston.createLogger({
+const logger: winston.Logger = winston.createLogger({
   format: formatSetting,
   transports: [
     new DailyRotateFile(getDailyRotateFile(LogLevel.INFO, 'log')),
@@ -44,3 +44,21 @@ export const logger: winston.Logger = winston.createLogger({
     new winston.transports.Console()
   ]
 })
+
+export const setLog = (level: LogLevel, message: string, functionName: string = "") : void => {
+  if (!isNullOrEmpty(functionName)) {
+    message = `function ${functionName}: ${message}`
+  }
+  
+  switch (level) {
+    case LogLevel.INFO:
+      logger.info(message)
+      break
+    case LogLevel.ERROR:
+      logger.error(message)
+      break
+    case LogLevel.WARN:
+      logger.warn(message)
+      break
+  }
+}

@@ -2,7 +2,7 @@ import "dotenv/config"
 import  express, { Express, Request, Response, NextFunction } from "express"
 import cors, { CorsOptions } from "cors"
 import { convertToBool, isNullOrEmpty } from "./common"
-import { logger } from "./logger"
+import { LogLevel, setLog } from "./logger"
 import { router } from "./routes/router"
 
 const app: Express = express()
@@ -14,11 +14,11 @@ app.use(express.urlencoded({ extended: true }))
 const corsOptions: CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin || whitelist.includes(origin) || convertToBool(process.env.ALLOW_CORS)) {
-      logger.info(`origin: ${origin}`)
+      setLog(LogLevel.INFO, `origin: ${origin}`)
       callback(null, true);
     } else {
       const msg = "Not allowed by CORS";
-      logger.error(`origin: ${origin} ${msg}`)
+      setLog(LogLevel.ERROR, `origin: ${origin} ${msg}`)
       callback(new Error(msg));
     }
   },
@@ -32,7 +32,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     // sendResponse(res, 403, "error", "CORS policy does not allow access from this origin.")
     return
   }
-  logger.info(`origin: ${req.originalUrl}`)
+  setLog(LogLevel.INFO, `origin: ${req.originalUrl}`)
   next()
 })
 
