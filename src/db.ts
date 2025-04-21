@@ -1,11 +1,12 @@
 import mongoose from 'mongoose'
 import { LogLevel, setLog } from './logger'
-import { isNullOrEmpty, envErrorMessage } from './common'
+import { isNullOrEmpty, responseMessage } from './common'
 
 if (isNullOrEmpty(process.env.DBURL)) {
-  throw new Error(envErrorMessage)
+  throw new Error(responseMessage.ENV_ERROR)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 mongoose.connect(process.env.DBURL!)
   .then(() => {
     setLog(LogLevel.INFO, 'MongoDB connected successfully')

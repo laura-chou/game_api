@@ -12,9 +12,12 @@ class JackpotRoute extends Route {
 
   protected setRoutes(): void {
     this.router.get('/', this.jackpotController.getJackPot)
+    this.router.patch('/update', this.jackpotController.updateJackPot)
   }
 
   protected setPrefix(): void {
     this.prefix = '/jackpot'
   }
 }
+
+export default JackpotRoute
