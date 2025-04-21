@@ -1,9 +1,9 @@
 import "dotenv/config"
-import "./db"
+import "./core/db"
 import  express, { Express, Request, Response, NextFunction } from "express"
 import cors, { CorsOptions } from "cors"
 import { convertToBool, isNullOrEmpty } from "./common"
-import { LogLevel, setLog } from "./logger"
+import { LogLevel, setLog } from "./core/logger"
 import { router } from "./routes/router"
 
 const app: Express = express()

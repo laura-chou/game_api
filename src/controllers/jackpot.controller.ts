@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { LogLevel, setLog } from "../logger"
+import { LogLevel, setLog } from "../core/logger"
 import { getNowDate, isNullOrEmpty, isTypeBoolean } from "../common"
 import { responseHandler, responseMessage } from "../common/response"
 import jackpot from "../models/jackpot.model"

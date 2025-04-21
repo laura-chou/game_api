@@ -1,6 +1,6 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file'
-import { isNullOrEmpty } from './common'
+import { isNullOrEmpty } from '../common'
 const { combine, timestamp, printf } = winston.format
 
 export const enum LogLevel {
