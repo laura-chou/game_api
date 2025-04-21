@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { LogLevel, setLog } from "../logger"
-import { getNowDate, isNullOrEmpty, isTypeBoolean, responseHandler, responseMessage } from "../common"
+import { getNowDate, isNullOrEmpty, isTypeBoolean } from "../common"
+import { responseHandler, responseMessage } from "../common/response"
 import jackpot from "../models/jackpot.model"
 
 class JackpotController {
@@ -53,6 +54,7 @@ class JackpotController {
           responseHandler.badRequest(response, "JSON_FORMAT")
           return
         }
+
         const bonus: number = await this.getBonus()
         // const totalPeople: number = await getTotalPlayers()
         const totalPeople: number = 10

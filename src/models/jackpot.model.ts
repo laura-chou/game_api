@@ -1,5 +1,6 @@
 import 'dotenv/config'
-import { isNullOrEmpty, responseMessage } from '../common'
+import { isNullOrEmpty } from '../common'
+import { responseMessage } from '../common/response'
 import mongoose, { Schema, Model } from "mongoose"
 
 interface IJackpot {

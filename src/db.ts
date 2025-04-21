@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { LogLevel, setLog } from './logger'
-import { isNullOrEmpty, responseMessage } from './common'
+import { isNullOrEmpty } from './common'
+import { responseMessage } from "./common/response"
 
 if (isNullOrEmpty(process.env.DBURL)) {
   throw new Error(responseMessage.ENV_ERROR)
