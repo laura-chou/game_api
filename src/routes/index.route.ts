@@ -1,23 +1,8 @@
-import IndexController from "../controllers/index.controller"
-import Route from "./route"
+import * as indexController from "@/controllers/index.controller";
+import { createRoute, RouteConfig } from "@/routes/route.utils";
 
-class IndexRoute extends Route {
-
-  private indexController = new IndexController()
-
-  constructor() {
-    super()
-    this.setRoutes()
-    this.setPrefix()
-  }
-
-  protected setRoutes(): void {
-    this.router.get('/', this.indexController.getResponse)
-  }
-
-  protected setPrefix(): void {
-    this.prefix = '/'
-  }
-}
-
-export default IndexRoute
+export const indexRoute = (): RouteConfig => {
+  return createRoute("/", (router) => {
+    router.get("/", indexController.getResponse);
+  });
+};

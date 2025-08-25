@@ -1,4 +1,4 @@
-import { Response } from "express"
+import { Response } from "express";
 
 enum ApiStatus {
   SUCCESS = 200,
@@ -20,7 +20,7 @@ export const responseMessage = {
   INVALID_JSON_KEY: "Invalid JSON key.",
   INVALID_JSON_FORMAT: "Invalid JSON format.",
   ENV_ERROR: "Environment variable is not setting."
-}
+};
   
 const sendResponse = <T>(res: Response, status: ApiStatus, message: string, isJson: boolean = true, data?: T): void => {
   if (isJson) {
@@ -28,12 +28,12 @@ const sendResponse = <T>(res: Response, status: ApiStatus, message: string, isJs
         status,
         message,
         ...(data !== undefined && { data })
-    }
-    res.status(status).json(response)
-    return
+    };
+    res.status(status).json(response);
+    return;
   }
-  res.status(status).send(data)
-}
+  res.status(status).send(data);
+};
   
 export const responseHandler = {
   success<T>(res: Response, data?: T, isJson: boolean = true): void {
@@ -43,7 +43,7 @@ export const responseHandler = {
       responseMessage.SUCCESS, 
       isJson,
       data
-    )
+    );
   },
 
   noData(res: Response): void {
@@ -51,7 +51,7 @@ export const responseHandler = {
       res, 
       ApiStatus.SUCCESS, 
       responseMessage.NO_DATA
-    )
+    );
   },
 
   serverError(res: Response): void {
@@ -59,7 +59,7 @@ export const responseHandler = {
       res, 
       ApiStatus.SERVER_ERROR, 
       responseMessage.SERVER_ERROR
-    )
+    );
   },
 
   badRequest(res: Response, type: "CONTENT_TYPE" | "JSON_KEY" | "JSON_FORMAT"): void {
@@ -67,13 +67,13 @@ export const responseHandler = {
       CONTENT_TYPE: responseMessage.INVALID_CONTENT_TYPE,
       JSON_KEY: responseMessage.INVALID_JSON_KEY,
       JSON_FORMAT: responseMessage.INVALID_JSON_FORMAT
-    }
+    };
 
     sendResponse(
       res, 
       ApiStatus.BAD_REQUEST, 
       messageMap[type]
-    )
+    );
   }
-}
+};
   

@@ -1,9 +1,5 @@
-import { Request, Response } from "express"
+import { Request, Response } from "express";
 
-class IndexController {
-  getResponse = (request: Request, response: Response): void => {
-    response.status(200).send()
-  }
-}
-
-export default IndexController
+export const getResponse = (_: Request, response: Response): void => {
+  response.send("OK");
+};

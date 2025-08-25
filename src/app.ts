@@ -1,26 +1,50 @@
-import "dotenv/config"
-import "./core/db"
-import  express, { Express, Request, Response, NextFunction } from "express"
-import cors, { CorsOptions } from "cors"
-import { convertToBool, isNullOrEmpty } from "./common"
-import { LogLevel, setLog } from "./core/logger"
-import { router } from "./routes/router"
+import "dotenv/config";
+import cors, { CorsOptions } from "cors";
+import express, { json, urlencoded, Express, Request, Response, NextFunction } from "express";
+import morgan, { token } from "morgan";
 
-const app: Express = express()
-const whitelist: string[] = process.env.WHITELIST?.split(",") || []
+import { isJestTest, isNullOrEmpty } from "@/common/utils";
+import { connectDB } from "@/core/db";
+import { LogLevel, setLog } from "@/core/logger";
+import protectedRoutes from "@/routes/protected.routes";
+import publicRoutes from "@/routes/public.routes";
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+const app: Express = express();
+const whiteList: string[] = process.env.WHITELIST?.split(",") || [];
+const loggedOrigins = new Set<string>();
+
+token("apiPath", (req: Request) => `${req.method} ${req.originalUrl}`);
+app.use(morgan(":apiPath", {
+  immediate: true,
+  stream: {
+    write: (message: string) => {
+      setLog(LogLevel.HTTP, message.trim());
+    }
+  }
+}));
+
+app.use(json());
+app.use(urlencoded({ extended: true }));
+
+publicRoutes.forEach(route => {
+  app.use(route.prefix, route.router);
+});
 
 const corsOptions: CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || whitelist.includes(origin) || convertToBool(process.env.ALLOW_CORS)) {
-      setLog(LogLevel.INFO, `origin: ${origin}`)
+    if (isJestTest) {
       callback(null, true);
-    } else {
-      const msg = "Not allowed by CORS";
-      setLog(LogLevel.ERROR, `origin: ${origin} ${msg}`)
-      callback(new Error(msg));
+    }
+    if (!isNullOrEmpty(origin)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const hostName: string = new URL(origin!).hostname;
+
+      if (!loggedOrigins.has(hostName)) {
+        setLog(LogLevel.INFO, `origin: ${origin}`);
+        loggedOrigins.add(hostName);
+      }
+
+      callback(null, whiteList.includes(hostName));
     }
   },
   credentials: true
@@ -31,17 +55,19 @@ app.use(cors(corsOptions));
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   if (!isNullOrEmpty(error.message)) {
     // sendResponse(res, 403, "error", "CORS policy does not allow access from this origin.")
-    return
+    return;
   }
-  setLog(LogLevel.INFO, `origin: ${req.originalUrl}`)
-  next()
-})
+  setLog(LogLevel.INFO, `origin: ${req.originalUrl}`);
+  next();
+});
 
-router.forEach( route => {
-  app.use(route.getPrefix(), route.getRouter())
-})
+protectedRoutes.forEach(route => {
+  app.use(route.prefix, route.router);
+});
+
+if (!isJestTest) connectDB();
 
 app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`http://localhost:${process.env.PORT}`)
-})
+  console.log(`http://localhost:${process.env.PORT}`);
+});
