@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from "express";
 import moment from "moment-timezone";
 
 export const isJestTest: boolean = typeof jest !== "undefined";
@@ -35,3 +36,10 @@ export const convertToBool = (value: string | undefined): boolean => {
   return value.toLowerCase() === "true" || value === "1";
 };
 
+export const setFunctionName = <T extends (
+  request: Request,
+  response: Response,
+  next?: NextFunction) => void> (fn: T, name: string): T => {
+  Object.defineProperty(fn, "name", { value: name });
+  return fn;
+};

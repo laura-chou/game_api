@@ -1,7 +1,7 @@
 import { Logger, format, createLogger, transports, Logform } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 
-import { isNullOrEmpty } from "@/common/utils";
+import { isNullOrEmpty } from "../common/utils";
 const { combine, timestamp, printf } = format;
 
 export const enum LogLevel {

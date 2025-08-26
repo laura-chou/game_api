@@ -1,83 +1,76 @@
-import { Request, Response } from "express"
-import { LogLevel, setLog } from "../core/logger"
-import { getNowDate, isNullOrEmpty, isTypeBoolean } from "../common"
-import { responseHandler, responseMessage } from "../common/response"
-import jackpot from "../models/jackpot.model"
+import { Request, Response } from "express";
 
-class JackpotController {
-  private async getBonus(): Promise<number> {
-    try {
-      const result = await jackpot.findOne({}, "-_id -date")
-      setLog(LogLevel.INFO, "success", this.getBonus.name)
-      return result?.bonus ?? 0
+import { responseHandler } from "../common/response";
+import { getNowDate, setFunctionName } from "../common/utils";
+import { setLog, LogLevel, LogMessage } from "../core/logger";
+import jackpot from "../models/jackpot.model";
+
+import * as baseController from "./base.controller";
+import * as rescueMoneyController from "./rescueMoney.controller";
+
+const getBonus = setFunctionName(
+  async(): Promise<number> => {
+      try {
+        const result = await jackpot.findOne({}, "-_id -date").lean();
+        setLog(LogLevel.INFO, LogMessage.SUCCESS, getBonus.name);
+        return result?.bonus ?? 0;
     } catch (error) {
-      setLog(LogLevel.ERROR, error instanceof Error ? error.message : "Unknown error", this.getBonus.name)
-      throw error
+      setLog(
+        LogLevel.ERROR,
+        error instanceof Error ? error.message : LogMessage.ERROR.UNKNOWN,
+        getBonus.name);
+      throw error;
     }
-  }
+  }, 
+  "getBonus"
+);
 
-  public getJackPot = Object.defineProperty(
-    async (request: Request, response: Response) => {
-      try {
-        const data: number = await this.getBonus()
-        setLog(LogLevel.INFO, "success", this.getJackPot.name)
-        if (data > 0) {
-          responseHandler.success(response, data.toString(), false)
-          return
-        }
-        responseHandler.noData(response)
-      } catch (error) {
-        setLog(LogLevel.ERROR, error instanceof Error ? error.message : "Unknown error", this.getJackPot.name)
-        responseHandler.serverError(response)
+export const getJackPot = setFunctionName(
+  async(_: Request, response: Response): Promise<void> => {
+    try {
+      const data: number = await getBonus();
+      setLog(LogLevel.INFO, LogMessage.SUCCESS, getJackPot.name);
+      if (data > 0) {
+        responseHandler.success(response, data.toString(), false);
+        return;
       }
-    },
-    "name",
-    { value: "getJackPot" }
-  )
+      responseHandler.noData(response);
+    } catch (error) {
+      baseController.errorHandler(response, error, getJackPot.name);
+    }
+  },
+  "getJackPot"
+);
 
-  updateJackPot = Object.defineProperty(
-    async (request: Request, response: Response) => {
-      try {
-        const contentType: string | undefined = request.headers["content-type"]
-        if (contentType !== "application/json") {
-          setLog(LogLevel.ERROR, responseMessage.INVALID_CONTENT_TYPE, this.updateJackPot.name)
-          responseHandler.badRequest(response, "CONTENT_TYPE")
-          return
-        }
-        if (isNullOrEmpty(request.body.win)) {
-          setLog(LogLevel.ERROR, responseMessage.INVALID_JSON_KEY, this.updateJackPot.name) 
-          responseHandler.badRequest(response, "JSON_KEY")
-          return
-        }
-        if (!isTypeBoolean(request.body.win)) {
-          setLog(LogLevel.ERROR, responseMessage.INVALID_JSON_FORMAT, this.updateJackPot.name)
-          responseHandler.badRequest(response, "JSON_FORMAT")
-          return
-        }
-
-        const bonus: number = await this.getBonus()
-        // const totalPeople: number = await getTotalPlayers()
-        const totalPeople: number = 10
-        let updateBonus: number = 888888
-        if (!request.body.win && bonus !== 0) {
-          updateBonus = bonus * totalPeople
-        }
-        const data = {
-          bonus: updateBonus,
-          date: getNowDate()
-        }
-        await jackpot.updateOne({}, data, { new: true })
-        setLog(LogLevel.INFO, "success", this.updateJackPot.name)
-        responseHandler.success(response, updateBonus.toString(), false)
-      } catch (error) {
-        setLog(LogLevel.ERROR, error instanceof Error ? error.message : "Unknown error", this.updateJackPot.name)
-        responseHandler.serverError(response)
+export const updateJackPot = setFunctionName(
+  async(request: Request, response: Response): Promise<void> => {
+    try {
+      if (!baseController.validateContentType(request, response, updateJackPot.name)) {
+        return;
       }
-    },
-    "name",
-    { value: "updateJackPot" }
-  )
-}
-  
-export default JackpotController
-  
+      const fields = [
+        { key: "win", type: "boolean" }
+      ];
+      if (!baseController.validateBodyFields(request, response, updateJackPot.name, fields)) {
+        return;
+      }
+
+      const bonus: number = await getBonus();
+      const totalPlayers: number = await rescueMoneyController.getTotalPlayers();
+      let updateBonus: number = 888888;
+      if (!request.body.win && bonus !== 0) {
+        updateBonus = bonus * totalPlayers;
+      }
+      const data = {
+        bonus: updateBonus,
+        date: getNowDate()
+      };
+      await jackpot.updateOne({}, data);
+      setLog(LogLevel.INFO, LogMessage.SUCCESS, updateJackPot.name);
+      responseHandler.success(response, updateBonus.toString(), false);
+    } catch (error) {
+      baseController.errorHandler(response, error, updateJackPot.name);
+    }
+  },
+  "updateJackPot"
+);

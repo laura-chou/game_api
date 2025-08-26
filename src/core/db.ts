@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-import { RESPONSE_MESSAGE } from "@/common/constants";
-import { isNullOrEmpty } from "@/common/utils";
-import { LogLevel, LogMessage, setLog } from "@/core/logger";
+import { RESPONSE_MESSAGE } from "../common/constants";
+import { isNullOrEmpty } from "../common/utils";
+import { LogLevel, LogMessage, setLog } from "../core/logger";
 
 if (isNullOrEmpty(process.env.DBURL)) {
   throw new Error(RESPONSE_MESSAGE.ENV_ERROR);

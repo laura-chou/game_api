@@ -1,5 +1,5 @@
-import { indexRoute } from "@/routes/index.route";
-import { RouteConfig } from "@/routes/route.utils";
+import { indexRoute } from "./index.route";
+import { RouteConfig } from "./route.utils";
 
 const publicRoutes: Array<RouteConfig> = [
   indexRoute()

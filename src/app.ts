@@ -3,11 +3,11 @@ import cors, { CorsOptions } from "cors";
 import express, { json, urlencoded, Express, Request, Response, NextFunction } from "express";
 import morgan, { token } from "morgan";
 
-import { isJestTest, isNullOrEmpty } from "@/common/utils";
-import { connectDB } from "@/core/db";
-import { LogLevel, setLog } from "@/core/logger";
-import protectedRoutes from "@/routes/protected.routes";
-import publicRoutes from "@/routes/public.routes";
+import { isJestTest, isNullOrEmpty } from "../src/common/utils";
+import { connectDB } from "../src/core/db";
+import { LogLevel, setLog } from "../src/core/logger";
+import protectedRoutes from "../src/routes/protected.routes";
+import publicRoutes from "../src/routes/public.routes";
 
 const app: Express = express();
 const whiteList: string[] = process.env.WHITELIST?.split(",") || [];
@@ -71,3 +71,5 @@ app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`http://localhost:${process.env.PORT}`);
 });
+
+export default app;

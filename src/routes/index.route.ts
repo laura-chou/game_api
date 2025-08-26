@@ -1,5 +1,6 @@
-import * as indexController from "@/controllers/index.controller";
-import { createRoute, RouteConfig } from "@/routes/route.utils";
+import * as indexController from "../controllers/index.controller";
+
+import { createRoute, RouteConfig } from "./route.utils";
 
 export const indexRoute = (): RouteConfig => {
   return createRoute("/", (router) => {
