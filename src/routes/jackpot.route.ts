@@ -1,23 +1,9 @@
-import JackpotController from "@/controllers/jackpot.controller";
-import Route from "@/routes/route.utils";
+import * as jockpotController from "../controllers/rescueMoney.controller";
 
-class JackpotRoute extends Route {
-  private jackpotController = new JackpotController();
-  
-  constructor() {
-    super();
-    this.setRoutes();
-    this.setPrefix();
-  }
+import { createRoute, RouteConfig } from "./route.utils";
 
-  protected setRoutes(): void {
-    this.router.get("/", this.jackpotController.getJackPot);
-    this.router.patch("/update", this.jackpotController.updateJackPot);
-  }
+export const jackpotRoutes = (): RouteConfig => {
+  return createRoute("/jackpot", (router) => {
 
-  protected setPrefix(): void {
-    this.prefix = "/jackpot";
-  }
-}
-
-export default JackpotRoute;
+  });
+};

@@ -1,6 +1,6 @@
 import request from "supertest";
 
-import { HTTP_STATUS } from "../../src/common/constants";
+import { HTTP_STATUS, RESPONSE_MESSAGE } from "../../src/common/constants";
 
 import { expectResponse } from "./testUtils";
 
@@ -25,6 +25,52 @@ interface ServerErrorConfig {
     setupMocks?: () => void;
   }[];
 }
+
+type ValidationTestCase = [
+  description: string,
+  requestBody: Record<string, unknown>,
+  isSetJson: boolean,
+  expectedMessage: string
+];
+
+interface ValidationConfig<T extends Record<string, unknown>> {
+  route: string;
+  validBody: T;
+  requestFn: (
+    route: string,
+    body: Partial<T> | Record<string, unknown>,
+    status: number,
+    isSetJson?: boolean
+  ) => Promise<request.Response>;
+}
+
+type ValidationBaseModel = {
+  [key: string]: unknown;
+};
+
+const generateInvalidTypeBody = <T extends Record<string, unknown>>(validBody: T): { [K in keyof T]: unknown } => {
+  return Object.keys(validBody).reduce((acc, key) => {
+    const value = validBody[key as keyof T];
+
+    let invalidValue: unknown;
+
+    if (typeof value === "number") {
+      invalidValue = "not a number";
+    } else if (typeof value === "string") {
+      invalidValue = 9999;
+    } else if (typeof value === "boolean") {
+      invalidValue = "true";
+    } else if (Array.isArray(value)) {
+      invalidValue = "not an array";
+    } else if (typeof value === "object" && value !== null) {
+      invalidValue = "not an object";
+    } else {
+      invalidValue = null;
+    }
+
+    return { ...acc, [key]: invalidValue };
+  }, {} as { [K in keyof T]: unknown });
+};
 
 export const describeServerErrorTests = (
   config: ServerErrorConfig,
@@ -55,6 +101,32 @@ export const describeServerErrorTests = (
             ));
 
         expectResponseFn.error(response);
+      }
+    );
+  });
+};
+
+export const describeValidationErrorTests = <T extends ValidationBaseModel>(
+  config: ValidationConfig<T>,
+  expectResponseFn: typeof expectResponse
+): void => {
+  describe("Validation Error Cases", () => {
+    const validationTestCases: ValidationTestCase[] = [
+      ["invalid Content-Type", config.validBody, false, RESPONSE_MESSAGE.INVALID_CONTENT_TYPE],
+      ["missing key in JSON body", { wrongKey: "value" }, true, RESPONSE_MESSAGE.INVALID_JSON_KEY],
+      ["invalid data type", generateInvalidTypeBody(config.validBody), true, RESPONSE_MESSAGE.INVALID_JSON_FORMAT]
+    ];
+
+    test.each(validationTestCases)(
+      "should bad request for %s",
+      async(_, requestBody, isSetJson, expectedMessage) => {
+        const response = await config.requestFn(
+          config.route,
+          requestBody,
+          HTTP_STATUS.BAD_REQUEST,
+          isSetJson
+        );
+        expectResponseFn.badRequest(response, expectedMessage);
       }
     );
   });

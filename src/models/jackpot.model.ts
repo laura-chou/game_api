@@ -1,8 +1,8 @@
 import "dotenv/config";
 import mongoose, { Schema, Model } from "mongoose";
 
-import { responseMessage } from "@/common/response";
-import { isNullOrEmpty } from "@/common/utils";
+import { responseMessage } from "../../src/common/response";
+import { isNullOrEmpty } from "../../src/common/utils";
 
 interface IJackpot {
   bonus: number

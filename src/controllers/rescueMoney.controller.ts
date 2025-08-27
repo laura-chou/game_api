@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { responseHandler } from "../common/response";
-import { setFunctionName } from "../common/utils";
+import { getNowDate, setFunctionName } from "../common/utils";
 import { LogLevel, LogMessage, setLog } from "../core/logger";
 import rescueMoney, { IRescueMoney } from "../models/rescueMoney.model";
 
@@ -58,6 +58,10 @@ const getPlayersData = (): Promise<IRescueMoney[]> => {
   });
 };
 
+const isPlayerInList = (data: IPlayerFormattedData[], player: string): boolean => {
+  return data.some(item => item.players.includes(player));
+};
+
 export const getPlayers = setFunctionName(
   async(_request: Request, response: Response): Promise<void> => {
     try {
@@ -101,20 +105,35 @@ export const getTopFive = setFunctionName(
   "getTopFive"
 );
 
-// export const getTopFive = baseController.getTopFiveData<IRescueMoney, IPlayerFormattedData>(
-//   getPlayersData,
-//   getFormattedData,
-//   "getTopFive"
-// );
+export const addPlayer = setFunctionName(
+  async(request: Request, response: Response): Promise<void> => {
+    try {
+      if (!baseController.validateContentType(request, response, addPlayer.name)) {
+        return;
+      }
+      const fields = [
+        { key: "player", type: "string" },
+        { key: "money", type: "string" }
+      ];
+      if (!baseController.validateBodyFields(request, response, addPlayer.name, fields)) {
+        return;
+      }
 
-// export const addPlayer = baseController.addPlayerData<IRescueMoney, IPlayerFormattedData>(
-//   rescueMoney,
-//   [
-//     { key: "player", type: "string" },
-//     { key: "money", type: "string" }
-//   ],
-//   getPlayersData,
-//   getFormattedData,
-//   (data, newPlayer) => data.some(item => item.players.includes(newPlayer)),
-//   "addPlayer"
-// );
+      const data = {
+        ...request.body,
+        date: getNowDate()
+      };
+
+      await rescueMoney.create(data);
+
+      setLog(LogLevel.INFO, LogMessage.SUCCESS, addPlayer.name);
+
+      const playersData = await getPlayersData();
+      const resultData = getFormattedData(playersData).slice(0, 5);
+      responseHandler.success(response, { isTopFive: isPlayerInList(resultData, data.player) });
+    } catch (error) {
+      baseController.errorHandler(response, error, addPlayer.name);
+    }
+  },
+  "addPlayer"
+);

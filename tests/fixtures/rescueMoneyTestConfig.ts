@@ -4,10 +4,10 @@ const base = "/rescue-money";
 export const ROUTE = {
   BASE: base,
   TOP5: `${base}/top5`,
-  ADD: `${base}/player`
+  CREATE: `${base}/create`
 } as const;
 
-interface IRawMoneyData {
+type IRawMoneyData = {
   player: string;
   money: string; 
 }
@@ -33,7 +33,8 @@ export const MOCK_RAW_DATA: IRawMoneyData[] = [
   { player: "newPlayer", money: "3500" }
 ];
 
-export const MOCK_INSERT_DATA: IRawMoneyData = { player: "newPlayer", money: "3500" };
+export const MOCK_NEW_TOP_PLAYER: IRawMoneyData = { player: "newPlayer", money: "3500" };
+export const MOCK_NEW_EXTRA_PLAYER: IRawMoneyData = { player: "newPlayer2", money: "100" };
 
 export const MOCK_FORMATTED_DATA: IFormattedMoneyData[] = [
   { rank: 1, money: "3500", players: ["newPlayer"] },
