@@ -46,7 +46,18 @@ const getDailyRotateFile = (level: LogLevel, fileName: string): DailyRotateFileO
   };
 };
 
+const customLevels = {
+  http: 0,
+  error: 1,
+  warn: 2,
+  info: 3,
+  verbose: 4,
+  debug: 5,
+  silly: 6
+};
+
 const logger: Logger = createLogger({
+  levels: customLevels,
   format: formatSetting,
   transports: [
     new DailyRotateFile(getDailyRotateFile(LogLevel.INFO, "log")),
@@ -69,6 +80,9 @@ export const setLog = (level: LogLevel, message: string, functionName: string = 
       break;
     case LogLevel.WARN:
       logger.warn(message);
+      break;
+    case LogLevel.HTTP:
+      logger.http(message);
       break;
   }
 };

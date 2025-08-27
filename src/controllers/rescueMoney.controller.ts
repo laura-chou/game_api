@@ -13,24 +13,6 @@ interface IPlayerFormattedData {
   players: string[];
 }
 
-export const getPlayers = setFunctionName(
-  async(_request: Request, response: Response): Promise<void> => {
-    try {
-      const result = await rescueMoney
-          .find({}, "-_id -date")
-          .sort({ money: "desc" })
-          .lean();
-      setLog(LogLevel.INFO, LogMessage.SUCCESS, getPlayers.name);
-      responseHandler.success(response, getFormattedData(result));
-    } catch (error) {
-      baseController.errorHandler(response, error, getPlayers.name);
-    }
-  },
-  "getPlayers"
-);
-
-
-
 const getFormattedData = (data: IRescueMoney[]): IPlayerFormattedData[] => {
   const groupData = new Map<string, Set<string>>();
 
@@ -55,6 +37,40 @@ const getFormattedData = (data: IRescueMoney[]): IPlayerFormattedData[] => {
     }));
 };
 
+const getPlayersData = (): Promise<IRescueMoney[]> => {
+  return new Promise((resolve, reject) => {
+    rescueMoney
+      .find({}, "-_id -date")
+      .sort({ money: "desc" })
+      .lean()
+      .then((result) => {
+        setLog(LogLevel.INFO, LogMessage.SUCCESS, getPlayersData.name);
+        resolve(result);
+      })
+      .catch((error) => {
+        setLog(
+          LogLevel.ERROR,
+          error instanceof Error ? error.message : "Unknown error",
+          getPlayersData.name
+        );
+        reject(error);
+      });
+  });
+};
+
+export const getPlayers = setFunctionName(
+  async(_request: Request, response: Response): Promise<void> => {
+    try {
+      const result = await getPlayersData();
+      setLog(LogLevel.INFO, LogMessage.SUCCESS, getPlayers.name);
+      responseHandler.success(response, getFormattedData(result));
+    } catch (error) {
+      baseController.errorHandler(response, error, getPlayers.name);
+    }
+  },
+  "getPlayers"
+);
+
 export const getTotalPlayers = setFunctionName(
   async(): Promise<number> => {
     try {
@@ -72,6 +88,18 @@ export const getTotalPlayers = setFunctionName(
   "getTotalPlayers"
 );
 
+export const getTopFive = setFunctionName(
+  async(_request: Request, response: Response): Promise<void> => {
+    try {
+      const data = await getPlayersData();
+      setLog(LogLevel.INFO, LogMessage.SUCCESS, getTopFive.name);
+      responseHandler.success(response, getFormattedData(data).slice(0, 5));
+    } catch (error) {
+      baseController.errorHandler(response, error, getTopFive.name);
+    }
+  },
+  "getTopFive"
+);
 
 // export const getTopFive = baseController.getTopFiveData<IRescueMoney, IPlayerFormattedData>(
 //   getPlayersData,
