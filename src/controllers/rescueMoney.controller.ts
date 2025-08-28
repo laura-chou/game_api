@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 
 import { responseHandler } from "../common/response";
 import { getNowDate, setFunctionName } from "../common/utils";
 import { LogLevel, LogMessage, setLog } from "../core/logger";
-import rescueMoney, { IRescueMoney } from "../models/rescueMoney.model";
+import RescueMoney, { IRescueMoney } from "../models/rescueMoney.model";
 
 import * as baseController from "./base.controller";
 
@@ -39,7 +39,7 @@ const getFormattedData = (data: IRescueMoney[]): IPlayerFormattedData[] => {
 
 const getPlayersData = (): Promise<IRescueMoney[]> => {
   return new Promise((resolve, reject) => {
-    rescueMoney
+    RescueMoney
       .find({}, "-_id -date")
       .sort({ money: "desc" })
       .lean()
@@ -62,23 +62,45 @@ const isPlayerInList = (data: IPlayerFormattedData[], player: string): boolean =
   return data.some(item => item.players.includes(player));
 };
 
-export const getPlayers = setFunctionName(
-  async(_request: Request, response: Response): Promise<void> => {
-    try {
-      const result = await getPlayersData();
-      setLog(LogLevel.INFO, LogMessage.SUCCESS, getPlayers.name);
-      responseHandler.success(response, getFormattedData(result));
-    } catch (error) {
-      baseController.errorHandler(response, error, getPlayers.name);
-    }
-  },
-  "getPlayers"
-);
+type HandlerOptions = {
+  name: string;
+  sliceFn?: (data: object[]) => object[];
+};
+
+const createGetPlayersHandler = (options: HandlerOptions): RequestHandler => {
+  const { name, sliceFn } = options;
+
+  return setFunctionName(
+    async(_request: Request, response: Response): Promise<void> => {
+      try {
+        const raw = await getPlayersData();
+        setLog(LogLevel.INFO, LogMessage.SUCCESS, name);
+
+        const formatted = getFormattedData(raw);
+        const payload = sliceFn ? sliceFn(formatted) : formatted;
+
+        responseHandler.success(response, payload);
+      } catch (error) {
+        baseController.errorHandler(response, error, name);
+      }
+    },
+    name
+  );
+};
+
+export const getPlayers = createGetPlayersHandler({
+  name: "getPlayers",
+});
+
+export const getTopFive = createGetPlayersHandler({
+  name: "getTopFive",
+  sliceFn: data => data.slice(0, 5),
+});
 
 export const getTotalPlayers = setFunctionName(
   async(): Promise<number> => {
     try {
-      const result = await rescueMoney.distinct("player");
+      const result = await RescueMoney.distinct("player");
       setLog(LogLevel.INFO, LogMessage.SUCCESS, getTotalPlayers.name);
       return result.length;
     } catch (error) {
@@ -90,19 +112,6 @@ export const getTotalPlayers = setFunctionName(
     }
   },
   "getTotalPlayers"
-);
-
-export const getTopFive = setFunctionName(
-  async(_request: Request, response: Response): Promise<void> => {
-    try {
-      const data = await getPlayersData();
-      setLog(LogLevel.INFO, LogMessage.SUCCESS, getTopFive.name);
-      responseHandler.success(response, getFormattedData(data).slice(0, 5));
-    } catch (error) {
-      baseController.errorHandler(response, error, getTopFive.name);
-    }
-  },
-  "getTopFive"
 );
 
 export const addPlayer = setFunctionName(
@@ -124,7 +133,7 @@ export const addPlayer = setFunctionName(
         date: getNowDate()
       };
 
-      await rescueMoney.create(data);
+      await RescueMoney.create(data);
 
       setLog(LogLevel.INFO, LogMessage.SUCCESS, addPlayer.name);
 

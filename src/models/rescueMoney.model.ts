@@ -33,6 +33,6 @@ if (isNullOrEmpty(process.env.COLLECTION_RESCUE_MONEY)) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const rescueMoney: Model<IRescueMoney> = model<IRescueMoney>(process.env.COLLECTION_RESCUE_MONEY!, rescueMoneySchema);
+const RescueMoney: Model<IRescueMoney> = model<IRescueMoney>(process.env.COLLECTION_RESCUE_MONEY!, rescueMoneySchema);
 
-export default rescueMoney;
+export default RescueMoney;

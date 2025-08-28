@@ -1,5 +1,5 @@
 import { HTTP_STATUS } from "../src/common/constants";
-import rescueMoney from "../src/models/rescueMoney.model";
+import RescueMoney from "../src/models/rescueMoney.model";
 
 import { MOCK_FORMATTED_DATA, MOCK_FORMATTED_TOP5, MOCK_NEW_EXTRA_PLAYER, MOCK_NEW_TOP_PLAYER, MOCK_RAW_DATA, ROUTE } from "./fixtures/rescueMoneyTestConfig";
 import { describeServerErrorTests, describeValidationErrorTests } from "./fixtures/testStructures";
@@ -11,11 +11,11 @@ jest.mock("../src/models/rescueMoney.model", () => ({
 }));
 
 const mockRescueMoneyCreate = (data: object = MOCK_NEW_TOP_PLAYER): void => {
-  (rescueMoney.create as jest.Mock).mockResolvedValue(data);
+  (RescueMoney.create as jest.Mock).mockResolvedValue(data);
 };
 
 const mockRescueMoneyFindSuccess = (data: object = MOCK_RAW_DATA): void => {
-  (rescueMoney.find as jest.Mock).mockReturnValue({
+  (RescueMoney.find as jest.Mock).mockReturnValue({
     sort: jest.fn().mockReturnValue({
       lean: jest.fn().mockResolvedValue(data),
     }),
@@ -23,7 +23,7 @@ const mockRescueMoneyFindSuccess = (data: object = MOCK_RAW_DATA): void => {
 };
 
 const mockRescueMoneyFindError = (): void => {
-  rescueMoney.find = jest.fn().mockReturnValue({
+  RescueMoney.find = jest.fn().mockReturnValue({
     sort: jest.fn().mockReturnValue({
       lean: jest.fn().mockRejectedValue(new Error("DB Error")),
     }),
@@ -31,19 +31,16 @@ const mockRescueMoneyFindError = (): void => {
 };
 
 interface RouteTestCase {
-  name: string;
   route: string;
   formattedData: object[];
 }
 
 const getRouteTestCases: RouteTestCase[] = [
   {
-    name: "BASE",
     route: ROUTE.BASE,
     formattedData: MOCK_FORMATTED_DATA,
   },
   {
-    name: "TOP5",
     route: ROUTE.TOP5,
     formattedData: MOCK_FORMATTED_TOP5,
   },
@@ -54,8 +51,8 @@ describe("Rescue Money API", () => {
     jest.clearAllMocks();
   });
 
-  getRouteTestCases.forEach(({ name, route, formattedData }) => {
-    describe(`GET ${route} (${name})`, () => {
+  getRouteTestCases.forEach(({ route, formattedData }) => {
+    describe(`GET ${route}`, () => {
       describe("Success Cases", () => {
         test("should return formatted data when records exist", async() => {
           mockRescueMoneyFindSuccess();
@@ -78,8 +75,8 @@ describe("Rescue Money API", () => {
           requestFn: createRequest.get,
           dbErrorCases: [
             {
-              name: "rescueMoney.find",
-              mockFn: rescueMoney.find as jest.Mock,
+              name: "RescueMoney.find",
+              mockFn: RescueMoney.find as jest.Mock,
               setupMocks: mockRescueMoneyFindError,
             },
           ],
@@ -124,12 +121,12 @@ describe("Rescue Money API", () => {
         requestBody: MOCK_NEW_TOP_PLAYER,
         dbErrorCases: [
           {
-            name: "rescueMoney.create",
-            mockFn: rescueMoney.create as jest.Mock
+            name: "RescueMoney.create",
+            mockFn: RescueMoney.create as jest.Mock
           },
           {
-            name: "rescueMoney.find",
-            mockFn: rescueMoney.find as jest.Mock,
+            name: "RescueMoney.find",
+            mockFn: RescueMoney.find as jest.Mock,
             setupMocks: (): void => {
               mockRescueMoneyCreate([]);
               mockRescueMoneyFindError();
