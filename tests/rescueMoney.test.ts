@@ -10,103 +10,83 @@ jest.mock("../src/models/rescueMoney.model", () => ({
   create: jest.fn()
 }));
 
+const mockRescueMoneyCreate = (data: object = MOCK_NEW_TOP_PLAYER): void => {
+  (rescueMoney.create as jest.Mock).mockResolvedValue(data);
+};
+
+const mockRescueMoneyFindSuccess = (data: object = MOCK_RAW_DATA): void => {
+  (rescueMoney.find as jest.Mock).mockReturnValue({
+    sort: jest.fn().mockReturnValue({
+      lean: jest.fn().mockResolvedValue(data),
+    }),
+  });
+};
+
+const mockRescueMoneyFindError = (): void => {
+  rescueMoney.find = jest.fn().mockReturnValue({
+    sort: jest.fn().mockReturnValue({
+      lean: jest.fn().mockRejectedValue(new Error("DB Error")),
+    }),
+  });
+};
+
+interface RouteTestCase {
+  name: string;
+  route: string;
+  formattedData: object[];
+}
+
+const getRouteTestCases: RouteTestCase[] = [
+  {
+    name: "BASE",
+    route: ROUTE.BASE,
+    formattedData: MOCK_FORMATTED_DATA,
+  },
+  {
+    name: "TOP5",
+    route: ROUTE.TOP5,
+    formattedData: MOCK_FORMATTED_TOP5,
+  },
+];
+
 describe("Rescue Money API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe(`GET ${ROUTE.BASE}`, () => {
-    describe("Success Cases", () => {
-      test("should return formatted and sorted player data when data exists", async() => {
-        (rescueMoney.find as jest.Mock).mockReturnValue({
-          sort: jest.fn().mockReturnValue({
-            lean: jest.fn().mockResolvedValue(MOCK_RAW_DATA),
-          }),
-        });
-        const response = await createRequest.get(ROUTE.BASE, HTTP_STATUS.OK);
+  getRouteTestCases.forEach(({ name, route, formattedData }) => {
+    describe(`GET ${route} (${name})`, () => {
+      describe("Success Cases", () => {
+        test("should return formatted data when records exist", async() => {
+          mockRescueMoneyFindSuccess();
 
-        expectResponse.success(response, MOCK_FORMATTED_DATA);
-      });
-
-      test("should return empty data when no players found", async() => {
-        (rescueMoney.find as jest.Mock).mockReturnValue({
-          sort: jest.fn().mockReturnValue({
-            lean: jest.fn().mockResolvedValue([]),
-          }),
+          const response = await createRequest.get(route, HTTP_STATUS.OK);
+          expectResponse.success(response, formattedData);
         });
 
-        const response = await createRequest.get(ROUTE.BASE, HTTP_STATUS.OK);
-        expectResponse.success(response, []);
+        test("should return empty array when no records found", async() => {
+          mockRescueMoneyFindSuccess([]);
+
+          const response = await createRequest.get(route, HTTP_STATUS.OK);
+          expectResponse.success(response, []);
+        });
       });
+
+      describeServerErrorTests(
+        {
+          route,
+          requestFn: createRequest.get,
+          dbErrorCases: [
+            {
+              name: "rescueMoney.find",
+              mockFn: rescueMoney.find as jest.Mock,
+              setupMocks: mockRescueMoneyFindError,
+            },
+          ],
+        },
+        expectResponse
+      );
     });
-
-    describeServerErrorTests(
-      {
-        route: ROUTE.BASE,
-        requestFn: createRequest.get,
-        dbErrorCases: [
-          {
-            name: "rescueMoney.find",
-            mockFn: rescueMoney.find as jest.Mock,
-            setupMocks: (): void => {
-              rescueMoney.find = jest.fn().mockReturnValue({
-                sort: jest.fn().mockReturnValue({
-                  lean: jest.fn().mockRejectedValue(new Error("DB Error"))
-                })
-              });
-            }
-          }
-        ]
-      },
-      expectResponse
-    );
-  });
-
-  describe(`GET ${ROUTE.TOP5}`, () => {
-    describe("Success Cases", () => {
-      test("should return top 5 formatted and sorted player data when data exists", async() => {
-        (rescueMoney.find as jest.Mock).mockReturnValue({
-          sort: jest.fn().mockReturnValue({
-            lean: jest.fn().mockResolvedValue(MOCK_RAW_DATA),
-          }),
-        });
-        const response = await createRequest.get(ROUTE.TOP5, HTTP_STATUS.OK);
-
-        expectResponse.success(response, MOCK_FORMATTED_TOP5);
-      });
-
-      test("should return empty data when no players found", async() => {
-        (rescueMoney.find as jest.Mock).mockReturnValue({
-          sort: jest.fn().mockReturnValue({
-            lean: jest.fn().mockResolvedValue([]),
-          }),
-        });
-
-        const response = await createRequest.get(ROUTE.TOP5, HTTP_STATUS.OK);
-        expectResponse.success(response, []);
-      });
-    });
-
-    describeServerErrorTests(
-      {
-        route: ROUTE.TOP5,
-        requestFn: createRequest.get,
-        dbErrorCases: [
-          {
-            name: "rescueMoney.find",
-            mockFn: rescueMoney.find as jest.Mock,
-            setupMocks: (): void => {
-              rescueMoney.find = jest.fn().mockReturnValue({
-                sort: jest.fn().mockReturnValue({
-                  lean: jest.fn().mockRejectedValue(new Error("DB Error"))
-                })
-              });
-            }
-          }
-        ]
-      },
-      expectResponse
-    );
   });
 
   describe(`POST ${ROUTE.CREATE}`, () => {
@@ -121,24 +101,16 @@ describe("Rescue Money API", () => {
 
     describe("Success Cases", () => {
       test("creates a new player and returns success with isTopFive = true", async() => {
-        (rescueMoney.create as jest.Mock).mockResolvedValue(MOCK_NEW_TOP_PLAYER);
-        (rescueMoney.find as jest.Mock).mockReturnValue({
-          sort: jest.fn().mockReturnValue({
-            lean: jest.fn().mockResolvedValue(MOCK_RAW_DATA),
-          }),
-        });
+        mockRescueMoneyCreate();
+        mockRescueMoneyFindSuccess();
 
         const response = await createRequest.post(ROUTE.CREATE, MOCK_NEW_TOP_PLAYER, HTTP_STATUS.OK);
         expectResponse.success(response, { isTopFive: true });
       });
 
       test("creates a new player and returns success with isTopFive = false", async() => {
-        (rescueMoney.create as jest.Mock).mockResolvedValue(MOCK_NEW_EXTRA_PLAYER);
-        (rescueMoney.find as jest.Mock).mockReturnValue({
-          sort: jest.fn().mockReturnValue({
-            lean: jest.fn().mockResolvedValue(MOCK_RAW_DATA),
-          }),
-        });
+        mockRescueMoneyCreate(MOCK_NEW_EXTRA_PLAYER);
+        mockRescueMoneyFindSuccess();
 
         const response = await createRequest.post(ROUTE.CREATE, MOCK_NEW_EXTRA_PLAYER, HTTP_STATUS.OK);
         expectResponse.success(response, { isTopFive: false });
@@ -159,12 +131,8 @@ describe("Rescue Money API", () => {
             name: "rescueMoney.find",
             mockFn: rescueMoney.find as jest.Mock,
             setupMocks: (): void => {
-              (rescueMoney.create as jest.Mock).mockResolvedValue([]);
-              rescueMoney.find = jest.fn().mockReturnValue({
-                sort: jest.fn().mockReturnValue({
-                  lean: jest.fn().mockRejectedValue(new Error("DB Error"))
-                })
-              });
+              mockRescueMoneyCreate([]);
+              mockRescueMoneyFindError();
             }
           }
         ]

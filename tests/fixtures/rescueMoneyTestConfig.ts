@@ -34,6 +34,7 @@ export const MOCK_RAW_DATA: IRawMoneyData[] = [
 ];
 
 export const MOCK_NEW_TOP_PLAYER: IRawMoneyData = { player: "newPlayer", money: "3500" };
+
 export const MOCK_NEW_EXTRA_PLAYER: IRawMoneyData = { player: "newPlayer2", money: "100" };
 
 export const MOCK_FORMATTED_DATA: IFormattedMoneyData[] = [
