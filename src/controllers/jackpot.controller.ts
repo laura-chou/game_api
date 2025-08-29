@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { responseHandler } from "../common/response";
 import { getNowDate, setFunctionName } from "../common/utils";
 import { setLog, LogLevel, LogMessage } from "../core/logger";
-import jackpot from "../models/jackpot.model";
+import Jackpot from "../models/jackpot.model";
 
 import * as baseController from "./base.controller";
 import * as rescueMoneyController from "./rescueMoney.controller";
@@ -11,9 +11,12 @@ import * as rescueMoneyController from "./rescueMoney.controller";
 const getBonus = setFunctionName(
   async(): Promise<number> => {
       try {
-        const result = await jackpot.findOne({}, "-_id -date").lean();
+        const result = await Jackpot.findOne({}, "-_id -date").lean();
+        if (!result) {
+          throw new Error("No jackpot data found");
+        }
         setLog(LogLevel.INFO, LogMessage.SUCCESS, getBonus.name);
-        return result?.bonus ?? 0;
+        return result?.bonus;
     } catch (error) {
       setLog(
         LogLevel.ERROR,
@@ -28,13 +31,9 @@ const getBonus = setFunctionName(
 export const getJackPot = setFunctionName(
   async(_: Request, response: Response): Promise<void> => {
     try {
-      const data: number = await getBonus();
+      const data = await getBonus();
       setLog(LogLevel.INFO, LogMessage.SUCCESS, getJackPot.name);
-      if (data > 0) {
-        responseHandler.success(response, data.toString(), false);
-        return;
-      }
-      responseHandler.noData(response);
+      responseHandler.success(response, data, false);
     } catch (error) {
       baseController.errorHandler(response, error, getJackPot.name);
     }
@@ -55,9 +54,9 @@ export const updateJackPot = setFunctionName(
         return;
       }
 
-      const bonus: number = await getBonus();
-      const totalPlayers: number = await rescueMoneyController.getTotalPlayers();
-      let updateBonus: number = 888888;
+      const bonus = await getBonus();
+      const totalPlayers = await rescueMoneyController.getTotalPlayers();
+      let updateBonus = 888888;
       if (!request.body.win && bonus !== 0) {
         updateBonus = bonus * totalPlayers;
       }
@@ -65,7 +64,7 @@ export const updateJackPot = setFunctionName(
         bonus: updateBonus,
         date: getNowDate()
       };
-      await jackpot.updateOne({}, data);
+      await Jackpot.updateOne({}, data);
       setLog(LogLevel.INFO, LogMessage.SUCCESS, updateJackPot.name);
       responseHandler.success(response, updateBonus.toString(), false);
     } catch (error) {

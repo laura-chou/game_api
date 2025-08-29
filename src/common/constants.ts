@@ -13,8 +13,8 @@ export const HTTP_STATUS = {
 export const CONTENT_TYPE = {
   JSON: "application/json",
   JSON_WITH_CHARSET: /application\/json/,
-  TEXT: "text/html",
-  TEXT_WITH_CHARSET: /text\/html/,
+  TEXT: "text/plain",
+  TEXT_WITH_CHARSET: /text\/plain/,
   FORM_URLENCODED: "application/x-www-form-urlencoded"
 } as const;
 

@@ -4,7 +4,7 @@ import mongoose, { Schema, Model } from "mongoose";
 import { responseMessage } from "../../src/common/response";
 import { isNullOrEmpty } from "../../src/common/utils";
 
-interface IJackpot {
+export interface IJackpot {
   bonus: number
   date: Date
 }
@@ -25,6 +25,6 @@ if (isNullOrEmpty(process.env.COLLECTION_JOCKPOT)) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const jackpot: Model<IJackpot> = mongoose.model(process.env.COLLECTION_JOCKPOT!, jackpotSchema);
+const Jackpot: Model<IJackpot> = mongoose.model(process.env.COLLECTION_JOCKPOT!, jackpotSchema);
 
-export default jackpot;
+export default Jackpot;

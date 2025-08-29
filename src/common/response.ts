@@ -32,9 +32,9 @@ const sendResponse = <T>(res: Response, status: ApiStatus, message: string, isJs
     res.status(status).json(response);
     return;
   }
-  res.status(status).send(data);
+  res.status(status).type("text").send(data);
 };
-  
+
 export const responseHandler = {
   success<T>(res: Response, data?: T, isJson: boolean = true): void {
     sendResponse(
