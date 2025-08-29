@@ -2,6 +2,10 @@ import { IJackpot } from "../../src/models/jackpot.model";
 
 const base = "/jackpot";
 
+type JackpotUpdate = {
+  win: boolean;
+}
+
 export const ROUTE = {
   BASE: base,
   UPDATE: `${base}/update`
@@ -14,3 +18,7 @@ export const TEST_DATA = {
 } as const;
 
 export const MOCK_BONUS_DATA: IJackpot = { bonus: TEST_DATA.CURRENT_BONUS, date: new Date() };
+
+export const MOCK_UPDATE_WIN_TRUE : JackpotUpdate = { win: true };
+
+export const MOCK_UPDATE_WIN_FALSE : JackpotUpdate = { win: false };

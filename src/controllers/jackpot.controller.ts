@@ -57,7 +57,7 @@ export const updateJackPot = setFunctionName(
       const bonus = await getBonus();
       const totalPlayers = await rescueMoneyController.getTotalPlayers();
       let updateBonus = 888888;
-      if (!request.body.win && bonus !== 0) {
+      if (!request.body.win) {
         updateBonus = bonus * totalPlayers;
       }
       const data = {
