@@ -1,13 +1,15 @@
 import { HTTP_STATUS } from "../src/common/constants";
+import * as rescueMoneyController from "../src/controllers/rescueMoney.controller";
 import RescueMoney from "../src/models/rescueMoney.model";
 
-import { MOCK_FORMATTED_DATA, MOCK_FORMATTED_TOP5, MOCK_NEW_EXTRA_PLAYER, MOCK_NEW_TOP_PLAYER, MOCK_RAW_DATA, ROUTE } from "./fixtures/rescueMoneyTestConfig";
+import { MOCK_DISTINCT_PLAYERS, MOCK_FORMATTED_DATA, MOCK_FORMATTED_TOP5, MOCK_NEW_EXTRA_PLAYER, MOCK_NEW_TOP_PLAYER, MOCK_RAW_DATA, ROUTE } from "./fixtures/rescueMoneyTestConfig";
 import { describeServerErrorTests, describeValidationErrorTests } from "./fixtures/testStructures";
 import { createRequest, expectResponse } from "./fixtures/testUtils";
 
 jest.mock("../src/models/rescueMoney.model", () => ({
   find: jest.fn(),
-  create: jest.fn()
+  create: jest.fn(),
+  distinct: jest.fn()
 }));
 
 const mockRescueMoneyCreate = (data: object = MOCK_NEW_TOP_PLAYER): void => {
@@ -25,9 +27,17 @@ const mockRescueMoneyFindSuccess = (data: object = MOCK_RAW_DATA): void => {
 const mockRescueMoneyFindError = (): void => {
   RescueMoney.find = jest.fn().mockReturnValue({
     sort: jest.fn().mockReturnValue({
-      lean: jest.fn().mockRejectedValue(new Error("DB Error")),
+      lean: jest.fn().mockRejectedValue(new Error("DB error")),
     }),
   });
+};
+
+const mockRescueMoneyDistinct = (isError: boolean = false): void => {
+  if (isError) {
+    (RescueMoney.distinct as jest.Mock).mockRejectedValueOnce(new Error("DB error"));
+  } else {
+    (RescueMoney.distinct as jest.Mock).mockResolvedValueOnce(MOCK_DISTINCT_PLAYERS);
+  }
 };
 
 interface RouteTestCase {
@@ -136,5 +146,22 @@ describe("Rescue Money API", () => {
       },
       expectResponse
     );
+  });
+});
+
+describe("Function Cases", () => {
+  describe("getTotalPlayers", () => {
+    test("should return the total player count", async() => {
+      mockRescueMoneyDistinct();
+
+      const result = await rescueMoneyController.getTotalPlayers();
+      expect(result).toBe(3);
+    });
+
+    test("should return 500 if RescueMoney.distinct throws error", async() => {
+      mockRescueMoneyDistinct(true);
+      
+      await expect(rescueMoneyController.getTotalPlayers()).rejects.toThrow("DB error");
+    });
   });
 });

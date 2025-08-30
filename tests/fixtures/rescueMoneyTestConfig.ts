@@ -50,3 +50,5 @@ export const MOCK_FORMATTED_DATA: IFormattedMoneyData[] = [
 ];
 
 export const MOCK_FORMATTED_TOP5: IFormattedMoneyData[] = MOCK_FORMATTED_DATA.slice(0, 5);
+
+export const MOCK_DISTINCT_PLAYERS: string[] = ["player1", "player2", "player3"];
