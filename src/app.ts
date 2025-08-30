@@ -9,6 +9,8 @@ import { LogLevel, setLog } from "../src/core/logger";
 import protectedRoutes from "../src/routes/protected.routes";
 import publicRoutes from "../src/routes/public.routes";
 
+import { responseHandler } from "./common/response";
+
 const app: Express = express();
 const whiteList: string[] = process.env.WHITELIST?.split(",") || [];
 const loggedOrigins = new Set<string>();
@@ -52,13 +54,14 @@ const corsOptions: CorsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((error: Error, _request: Request, response: Response, _next: NextFunction) => {
   if (!isNullOrEmpty(error.message)) {
-    // sendResponse(res, 403, "error", "CORS policy does not allow access from this origin.")
-    return;
+    setLog(LogLevel.ERROR, error.message);
+    responseHandler.forbidden(response);
+  } else {
+    setLog(LogLevel.ERROR, `Unhandled error:\n ${error}`);
+    responseHandler.serverError(response);
   }
-  setLog(LogLevel.INFO, `origin: ${req.originalUrl}`);
-  next();
 });
 
 protectedRoutes.forEach(route => {

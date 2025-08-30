@@ -8,6 +8,13 @@ import {
 } from "../common/utils";
 import { LogLevel, LogMessage, setLog } from "../core/logger";
 
+interface HandlerOptions<TInput, TOutput> {
+  name: string;
+  getPlayersData: () => Promise<TInput[]>;
+  getFormattedData: (raw: TInput[]) => TOutput[];
+  sliceFn?: (data: TOutput[]) => TOutput[];
+}
+
 export const errorHandler = (
   response: Response,
   error: unknown,
@@ -18,16 +25,6 @@ export const errorHandler = (
     error instanceof Error ? error.message : LogMessage.ERROR.UNKNOWN,
     functionName);
   responseHandler.serverError(response);
-};
-
-export const validateContentType = (request: Request, response: Response, functionName: string): boolean => {
-  const contentType: string | undefined = request.headers["content-type"];
-  if (contentType !== "application/json") {
-    setLog(LogLevel.ERROR, RESPONSE_MESSAGE.INVALID_CONTENT_TYPE, functionName);
-    responseHandler.badRequest(response, "CONTENT_TYPE");
-    return false;
-  }
-  return true;
 };
 
 const validateFieldType = (value: unknown, type: string): boolean => {
@@ -41,6 +38,16 @@ const validateFieldType = (value: unknown, type: string): boolean => {
     default:
       return false;
   }
+};
+
+export const validateContentType = (request: Request, response: Response, functionName: string): boolean => {
+  const contentType: string | undefined = request.headers["content-type"];
+  if (contentType !== "application/json") {
+    setLog(LogLevel.ERROR, RESPONSE_MESSAGE.INVALID_CONTENT_TYPE, functionName);
+    responseHandler.badRequest(response, "CONTENT_TYPE");
+    return false;
+  }
+  return true;
 };
 
 export const validateBodyFields = (
@@ -64,13 +71,6 @@ export const validateBodyFields = (
   }
   return true;
 };
-
-interface HandlerOptions<TInput, TOutput> {
-  name: string;
-  getPlayersData: () => Promise<TInput[]>;
-  getFormattedData: (raw: TInput[]) => TOutput[];
-  sliceFn?: (data: TOutput[]) => TOutput[];
-}
 
 export const createGetPlayersHandler = <TInput, TOutput>(
   options: HandlerOptions<TInput, TOutput>

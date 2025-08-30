@@ -1,8 +1,8 @@
 import "dotenv/config";
 import mongoose, { Schema, Model } from "mongoose";
 
-import { responseMessage } from "../../src/common/response";
 import { isNullOrEmpty } from "../../src/common/utils";
+import { RESPONSE_MESSAGE } from "../common/constants";
 
 export interface IJackpot {
   bonus: number
@@ -24,7 +24,7 @@ const jackpotSchema = new Schema<IJackpot>({
 });
 
 if (isNullOrEmpty(process.env.COLLECTION_JACKPOT)) {
-  throw new Error(responseMessage.ENV_ERROR);
+  throw new Error(RESPONSE_MESSAGE.ENV_ERROR);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

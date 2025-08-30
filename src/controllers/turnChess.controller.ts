@@ -3,9 +3,21 @@ import { Request, Response } from "express";
 import { responseHandler } from "../common/response";
 import { getNowDate, setFunctionName } from "../common/utils";
 import { LogLevel, LogMessage, setLog } from "../core/logger";
-import TurnChess, { IPlayer, IPlayerFormattedData, ITurnChess } from "../models/turnChess.model";
+import TurnChess, { ITurnChess } from "../models/turnChess.model";
 
 import * as baseController from "./base.controller";
+
+interface IPlayer {
+  character: number;
+  player: string;
+  score: number;
+}
+
+interface IPlayerFormattedData {
+  rank: number;
+  spentTime: string;
+  players: IPlayer[];
+}
 
 const getFormattedData = (data: ITurnChess[]): IPlayerFormattedData[] => {
   const groupData = new Map<string, IPlayer[]>();

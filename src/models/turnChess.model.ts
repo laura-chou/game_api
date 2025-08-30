@@ -13,18 +13,6 @@ export interface ITurnChess {
   date: Date;
 }
 
-export interface IPlayer {
-  character: number;
-  player: string;
-  score: number;
-}
-
-export interface IPlayerFormattedData {
-  rank: number;
-  spentTime: string;
-  players: IPlayer[];
-}
-
 const turnChessSchema = new Schema<ITurnChess>({
   character: {
     type: Number,

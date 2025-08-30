@@ -1,28 +1,20 @@
 import { Response } from "express";
 
-enum ApiStatus {
-  SUCCESS = 200,
-  BAD_REQUEST = 400,
-  SERVER_ERROR = 500
-}
-  
+import { HTTP_STATUS, RESPONSE_MESSAGE } from "./constants";
+
 interface ApiResponse<T> {
-  status: ApiStatus
+  status: number
   message: string
   data?: T
 }
-  
-export const responseMessage = {
-  SUCCESS: "",
-  NO_DATA: "No data.",
-  SERVER_ERROR: "Internal server error.",
-  INVALID_CONTENT_TYPE: "Invalid content type.",
-  INVALID_JSON_KEY: "Invalid JSON key.",
-  INVALID_JSON_FORMAT: "Invalid JSON format.",
-  ENV_ERROR: "Environment variable is not setting."
-};
-  
-const sendResponse = <T>(res: Response, status: ApiStatus, message: string, isJson: boolean = true, data?: T): void => {
+
+const sendResponse = <T>(
+  res: Response,
+  status: number,
+  message: string,
+  isJson: boolean = true,
+  data?: T
+): void => {
   if (isJson) {
     const response: ApiResponse<T> = {
         status,
@@ -39,41 +31,40 @@ export const responseHandler = {
   success<T>(res: Response, data?: T, isJson: boolean = true): void {
     sendResponse(
       res, 
-      ApiStatus.SUCCESS, 
-      responseMessage.SUCCESS, 
+      HTTP_STATUS.OK, 
+      RESPONSE_MESSAGE.SUCCESS,
       isJson,
       data
     );
   },
 
-  noData(res: Response): void {
+  forbidden(res: Response): void {
     sendResponse(
       res, 
-      ApiStatus.SUCCESS, 
-      responseMessage.NO_DATA
+      HTTP_STATUS.FORBIDDEN, 
+      RESPONSE_MESSAGE.FORBIDDEN_CORS
+    );
+  },
+
+  badRequest(res: Response, type: "CONTENT_TYPE" | "JSON_KEY" | "JSON_FORMAT"): void {
+    const messageMap = {
+      CONTENT_TYPE: RESPONSE_MESSAGE.INVALID_CONTENT_TYPE,
+      JSON_KEY: RESPONSE_MESSAGE.INVALID_JSON_KEY,
+      JSON_FORMAT: RESPONSE_MESSAGE.INVALID_JSON_FORMAT
+    };
+
+    sendResponse(
+      res, 
+      HTTP_STATUS.BAD_REQUEST, 
+      messageMap[type]
     );
   },
 
   serverError(res: Response): void {
     sendResponse(
       res, 
-      ApiStatus.SERVER_ERROR, 
-      responseMessage.SERVER_ERROR
-    );
-  },
-
-  badRequest(res: Response, type: "CONTENT_TYPE" | "JSON_KEY" | "JSON_FORMAT"): void {
-    const messageMap = {
-      CONTENT_TYPE: responseMessage.INVALID_CONTENT_TYPE,
-      JSON_KEY: responseMessage.INVALID_JSON_KEY,
-      JSON_FORMAT: responseMessage.INVALID_JSON_FORMAT
-    };
-
-    sendResponse(
-      res, 
-      ApiStatus.BAD_REQUEST, 
-      messageMap[type]
+      HTTP_STATUS.SERVER_ERROR, 
+      RESPONSE_MESSAGE.SERVER_ERROR
     );
   }
 };
-  
