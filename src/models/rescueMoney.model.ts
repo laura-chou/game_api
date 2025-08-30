@@ -25,7 +25,8 @@ const rescueMoneySchema = new Schema<IRescueMoney>({
     required: true
   }
 }, {
-  versionKey: false
+  versionKey: false,
+  collection: "rescueMoney"
 });
 
 if (isNullOrEmpty(process.env.COLLECTION_RESCUE_MONEY)) {

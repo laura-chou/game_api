@@ -18,9 +18,12 @@ const jackpotSchema = new Schema<IJackpot>({
     type: Date,
     required: true
   }
+}, {
+  versionKey: false,
+  collection: "jackpot"
 });
 
-if (isNullOrEmpty(process.env.COLLECTION_JOCKPOT)) {
+if (isNullOrEmpty(process.env.COLLECTION_JACKPOT)) {
   throw new Error(responseMessage.ENV_ERROR);
 }
 

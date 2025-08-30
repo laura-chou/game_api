@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 
 import { RESPONSE_MESSAGE } from "../common/constants";
 import { responseHandler } from "../common/response";
 import {
-    isNullOrEmpty, isTypeBoolean, isTypeInteger, isTypeString
+    isNullOrEmpty, isTypeBoolean, isTypeInteger, isTypeString,
+    setFunctionName
 } from "../common/utils";
 import { LogLevel, LogMessage, setLog } from "../core/logger";
 
@@ -62,4 +63,34 @@ export const validateBodyFields = (
     }
   }
   return true;
+};
+
+interface HandlerOptions<TInput, TOutput> {
+  name: string;
+  getPlayersData: () => Promise<TInput[]>;
+  getFormattedData: (raw: TInput[]) => TOutput[];
+  sliceFn?: (data: TOutput[]) => TOutput[];
+}
+
+export const createGetPlayersHandler = <TInput, TOutput>(
+  options: HandlerOptions<TInput, TOutput>
+): RequestHandler => {
+  const { name, getPlayersData, getFormattedData, sliceFn } = options;
+
+  return setFunctionName(
+    async(_request: Request, response: Response): Promise<void> => {
+      try {
+        const raw = await getPlayersData();
+        setLog(LogLevel.INFO, LogMessage.SUCCESS, name);
+
+        const formatted = getFormattedData(raw);
+        const payload = sliceFn ? sliceFn(formatted) : formatted;
+
+        responseHandler.success(response, payload);
+      } catch (error) {
+        errorHandler(response, error, name);
+      }
+    },
+    name
+  );
 };

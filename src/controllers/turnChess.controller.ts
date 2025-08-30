@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from "express";
+import { Request, Response } from "express";
 
 import { responseHandler } from "../common/response";
 import { getNowDate, setFunctionName } from "../common/utils";
@@ -67,38 +67,16 @@ const isPlayerInList = (data: IPlayerFormattedData[], player: string): boolean =
   return data.some(item => item.players.some(playerInfo => playerInfo.player === player));
 };
 
-type HandlerOptions = {
-  name: string;
-  sliceFn?: (data: object[]) => object[];
-};
-
-const createGetPlayersHandler = (options: HandlerOptions): RequestHandler => {
-  const { name, sliceFn } = options;
-
-  return setFunctionName(
-    async(_request: Request, response: Response): Promise<void> => {
-      try {
-        const raw = await getPlayersData();
-        setLog(LogLevel.INFO, LogMessage.SUCCESS, name);
-
-        const formatted = getFormattedData(raw);
-        const payload = sliceFn ? sliceFn(formatted) : formatted;
-
-        responseHandler.success(response, payload);
-      } catch (error) {
-        baseController.errorHandler(response, error, name);
-      }
-    },
-    name
-  );
-};
-
-export const getPlayers = createGetPlayersHandler({
+export const getPlayers = baseController.createGetPlayersHandler({
   name: "getPlayers",
+  getPlayersData,
+  getFormattedData
 });
 
-export const getTopFive = createGetPlayersHandler({
+export const getTopFive = baseController.createGetPlayersHandler({
   name: "getTopFive",
+  getPlayersData,
+  getFormattedData,
   sliceFn: data => data.slice(0, 5),
 });
 

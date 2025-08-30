@@ -2,7 +2,7 @@ import { HTTP_STATUS } from "../src/common/constants";
 import TurnChess from "../src/models/turnChess.model";
 
 import { describeServerErrorTests, describeValidationErrorTests } from "./fixtures/testStructures";
-import { createRequest, expectResponse } from "./fixtures/testUtils";
+import { createRequest, expectResponse, RouteTestCase } from "./fixtures/testUtils";
 import { MOCK_FORMATTED_DATA, MOCK_FORMATTED_TOP5, MOCK_NEW_EXTRA_PLAYER, MOCK_NEW_TOP_PLAYER, MOCK_RAW_DATA, ROUTE } from "./fixtures/turnChessTestConfig";
 
 jest.mock("../src/models/turnChess.model.ts", () => ({
@@ -29,11 +29,6 @@ const mockTurnChessFindError = (): void => {
 const mockTurnChessCreate = (data: object = MOCK_NEW_TOP_PLAYER): void => {
   (TurnChess.create as jest.Mock).mockResolvedValue(data);
 };
-
-interface RouteTestCase {
-  route: string;
-  formattedData: object[];
-}
 
 const getRouteTestCases: RouteTestCase[] = [
   {

@@ -4,7 +4,7 @@ import RescueMoney from "../src/models/rescueMoney.model";
 
 import { MOCK_DISTINCT_PLAYERS, MOCK_FORMATTED_DATA, MOCK_FORMATTED_TOP5, MOCK_NEW_EXTRA_PLAYER, MOCK_NEW_TOP_PLAYER, MOCK_RAW_DATA, ROUTE } from "./fixtures/rescueMoneyTestConfig";
 import { describeServerErrorTests, describeValidationErrorTests } from "./fixtures/testStructures";
-import { createRequest, expectResponse } from "./fixtures/testUtils";
+import { createRequest, expectResponse, RouteTestCase } from "./fixtures/testUtils";
 
 jest.mock("../src/models/rescueMoney.model", () => ({
   find: jest.fn(),
@@ -39,11 +39,6 @@ const mockRescueMoneyDistinct = (isError: boolean = false): void => {
     (RescueMoney.distinct as jest.Mock).mockResolvedValueOnce(MOCK_DISTINCT_PLAYERS);
   }
 };
-
-interface RouteTestCase {
-  route: string;
-  formattedData: object[];
-}
 
 const getRouteTestCases: RouteTestCase[] = [
   {

@@ -7,18 +7,18 @@ export const ROUTE = {
   CREATE: `${base}/create`
 } as const;
 
-type IRawMoneyData = {
+type IRawMoneyItem = {
   player: string;
   money: string; 
 }
 
-interface IFormattedMoneyData {
+interface IFormattedMoneyItem {
   rank: number;
   money: string;
   players: string[];
 }
 
-export const MOCK_RAW_DATA: IRawMoneyData[] = [
+export const MOCK_RAW_DATA: IRawMoneyItem[] = [
   { player: "test1", money: "1000" },
   { player: "test2", money: "2000" },
   { player: "test3", money: "3000" },
@@ -33,11 +33,11 @@ export const MOCK_RAW_DATA: IRawMoneyData[] = [
   { player: "newPlayer", money: "3500" }
 ];
 
-export const MOCK_NEW_TOP_PLAYER: IRawMoneyData = { player: "newPlayer", money: "3500" };
+export const MOCK_NEW_TOP_PLAYER: IRawMoneyItem = { player: "newPlayer", money: "3500" };
 
-export const MOCK_NEW_EXTRA_PLAYER: IRawMoneyData = { player: "newPlayer2", money: "100" };
+export const MOCK_NEW_EXTRA_PLAYER: IRawMoneyItem = { player: "newPlayer2", money: "100" };
 
-export const MOCK_FORMATTED_DATA: IFormattedMoneyData[] = [
+export const MOCK_FORMATTED_DATA: IFormattedMoneyItem[] = [
   { rank: 1, money: "3500", players: ["newPlayer"] },
   { rank: 2, money: "3000", players: ["test3"] },
   { rank: 3, money: "2000", players: ["test2", "test5"] },
@@ -49,6 +49,6 @@ export const MOCK_FORMATTED_DATA: IFormattedMoneyData[] = [
   { rank: 9, money: "100", players: ["test6"] }
 ];
 
-export const MOCK_FORMATTED_TOP5: IFormattedMoneyData[] = MOCK_FORMATTED_DATA.slice(0, 5);
+export const MOCK_FORMATTED_TOP5: IFormattedMoneyItem[] = MOCK_FORMATTED_DATA.slice(0, 5);
 
 export const MOCK_DISTINCT_PLAYERS: string[] = ["player1", "player2", "player3"];

@@ -47,7 +47,8 @@ const turnChessSchema = new Schema<ITurnChess>({
     required: true
   }
 }, {
-  versionKey: false
+  versionKey: false,
+  collection: "turnChess"
 });
 
 if (isNullOrEmpty(process.env.COLLECTION_TURN_CHESS)) {

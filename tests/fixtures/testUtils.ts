@@ -4,6 +4,10 @@ import app from "../../src/app";
 import { CONTENT_TYPE, HTTP_STATUS, RESPONSE_MESSAGE } from "../../src/common/constants";
 import { isTypeString } from "../../src/common/utils";
 
+export interface RouteTestCase {
+  route: string;
+  formattedData: object[];
+}
 
 export const createRequest = {
   get: (
