@@ -2,7 +2,8 @@ export const HTTP_STATUS = {
   OK: 200,
   BAD_REQUEST: 400,
   FORBIDDEN: 403,
-  SERVER_ERROR: 500
+  SERVER_ERROR: 500,
+  SERVER_UNAVAILABLE: 503
 } as const;
 
 export const CONTENT_TYPE = {
@@ -21,4 +22,5 @@ export const RESPONSE_MESSAGE = {
   INVALID_JSON_FORMAT: "Invalid JSON format.",
   ENV_ERROR: "Environment variable is not setting.",
   FORBIDDEN_CORS: "Forbidden: CORS policy does not allow access from this origin.",
+  SERVER_UNAVAILABLE: "Service unavailable"
 } as const;
