@@ -7,7 +7,6 @@ import { isJestTest, isNullOrEmpty } from "../src/common/utils";
 import { connectDB } from "../src/core/db";
 import { LogLevel, setLog } from "../src/core/logger";
 import protectedRoutes from "../src/routes/protected.routes";
-import publicRoutes from "../src/routes/public.routes";
 
 import { responseHandler } from "./common/response";
 
@@ -27,10 +26,6 @@ app.use(morgan(":apiPath", {
 
 app.use(json());
 app.use(urlencoded({ extended: true }));
-
-publicRoutes.forEach(route => {
-  app.use(route.prefix, route.router);
-});
 
 const corsOptions: CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
