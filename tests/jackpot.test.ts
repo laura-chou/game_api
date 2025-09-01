@@ -15,7 +15,7 @@ jest.mock("../src/controllers/rescueMoney.controller", () => ({
   getTotalPlayers: jest.fn(),
   getPlayers: jest.fn(),
   getTopFive: jest.fn(),
-  addPlayer: jest.fn()
+  createPlayer: jest.fn()
 }));
 
 const mockJackpotFindOneSuccess = (data: object = MOCK_BONUS_DATA): void => {

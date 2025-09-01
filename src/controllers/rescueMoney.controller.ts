@@ -92,17 +92,17 @@ export const getTotalPlayers = setFunctionName(
   "getTotalPlayers"
 );
 
-export const addPlayer = setFunctionName(
+export const createPlayer = setFunctionName(
   async(request: Request, response: Response): Promise<void> => {
     try {
-      if (!baseController.validateContentType(request, response, addPlayer.name)) {
+      if (!baseController.validateContentType(request, response, createPlayer.name)) {
         return;
       }
       const fields = [
         { key: "player", type: "string" },
         { key: "money", type: "string" }
       ];
-      if (!baseController.validateBodyFields(request, response, addPlayer.name, fields)) {
+      if (!baseController.validateBodyFields(request, response, createPlayer.name, fields)) {
         return;
       }
 
@@ -113,14 +113,14 @@ export const addPlayer = setFunctionName(
 
       await RescueMoney.create(data);
 
-      setLog(LogLevel.INFO, LogMessage.SUCCESS, addPlayer.name);
+      setLog(LogLevel.INFO, LogMessage.SUCCESS, createPlayer.name);
 
       const playersData = await getPlayersData();
       const resultData = getFormattedData(playersData).slice(0, 5);
-      responseHandler.success(response, { isTopFive: isPlayerInList(resultData, data.player) });
+      responseHandler.success(response, { topFive: isPlayerInList(resultData, data.player) });
     } catch (error) {
-      baseController.errorHandler(response, error, addPlayer.name);
+      baseController.errorHandler(response, error, createPlayer.name);
     }
   },
-  "addPlayer"
+  "createPlayer"
 );

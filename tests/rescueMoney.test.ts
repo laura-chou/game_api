@@ -102,20 +102,20 @@ describe("Rescue Money API", () => {
     );
 
     describe("Success Cases", () => {
-      test("creates a new player and returns success with isTopFive = true", async() => {
+      test("creates a new player and returns success with topFive = true", async() => {
         mockRescueMoneyCreate();
         mockRescueMoneyFindSuccess();
 
         const response = await createRequest.post(ROUTE.CREATE, MOCK_NEW_TOP_PLAYER, HTTP_STATUS.OK);
-        expectResponse.success(response, { isTopFive: true });
+        expectResponse.success(response, { topFive: true });
       });
 
-      test("creates a new player and returns success with isTopFive = false", async() => {
+      test("creates a new player and returns success with topFive = false", async() => {
         mockRescueMoneyCreate(MOCK_NEW_EXTRA_PLAYER);
         mockRescueMoneyFindSuccess();
 
         const response = await createRequest.post(ROUTE.CREATE, MOCK_NEW_EXTRA_PLAYER, HTTP_STATUS.OK);
-        expectResponse.success(response, { isTopFive: false });
+        expectResponse.success(response, { topFive: false });
       });
     });
 

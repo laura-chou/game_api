@@ -119,7 +119,7 @@ export const createPlayer = setFunctionName(
 
       const playersData = await getPlayersData();
       const resultData = getFormattedData(playersData).slice(0, 5);
-      responseHandler.success(response, { isTopFive: isPlayerInList(resultData, data.player) });
+      responseHandler.success(response, { topFive: isPlayerInList(resultData, data.player) });
     } catch (error) {
       baseController.errorHandler(response, error, createPlayer.name);
     }

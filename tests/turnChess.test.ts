@@ -92,20 +92,20 @@ describe("Turn Chess API", () => {
     );
 
     describe("Success Cases", () => {
-      test("creates a new player and returns success with isTopFive = true", async() => {
+      test("creates a new player and returns success with topFive = true", async() => {
         mockTurnChessCreate();
         mockTurnChessFindSuccess();
 
         const response = await createRequest.post(ROUTE.CREATE, MOCK_NEW_TOP_PLAYER, HTTP_STATUS.OK);
-        expectResponse.success(response, { isTopFive: true });
+        expectResponse.success(response, { topFive: true });
       });
 
-      test("creates a new player and returns success with isTopFive = false", async() => {
+      test("creates a new player and returns success with topFive = false", async() => {
         mockTurnChessCreate(MOCK_NEW_EXTRA_PLAYER);
         mockTurnChessFindSuccess();
 
         const response = await createRequest.post(ROUTE.CREATE, MOCK_NEW_EXTRA_PLAYER, HTTP_STATUS.OK);
-        expectResponse.success(response, { isTopFive: false });
+        expectResponse.success(response, { topFive: false });
       });
     });
 
