@@ -10,6 +10,7 @@ import * as baseController from "./base.controller";
 interface IPlayer {
   character: number;
   player: string;
+  message: string;
   score: number;
 }
 
@@ -23,9 +24,9 @@ const getFormattedData = (data: ITurnChess[]): IPlayerFormattedData[] => {
   const groupData = new Map<string, IPlayer[]>();
 
   for (const item of data) {
-    const { spentTime, character, player, score } = item;
-    const playerInfo: IPlayer = { character, player, score };
-    
+    const { spentTime, character, player, score, message } = item;
+    const playerInfo: IPlayer = { character, player, score, message };
+
     const existingPlayers = groupData.get(spentTime) || [];
 
     if (!existingPlayers.some(p => p.player === player)) {
@@ -102,7 +103,8 @@ export const createPlayer = setFunctionName(
         { key: "character", type: "integer" },
         { key: "player", type: "string" },
         { key: "score", type: "integer" },
-        { key: "spentTime", type: "string" }
+        { key: "spentTime", type: "string" },
+        { key: "message", type: "string" }
       ];
       if (!baseController.validateBodyFields(request, response, createPlayer.name, fields)) {
         return;
