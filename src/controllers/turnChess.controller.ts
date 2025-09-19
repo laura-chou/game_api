@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { responseHandler } from "../common/response";
-import { getNowDate, setFunctionName } from "../common/utils";
+import { getNowDate, setFunctionName, isNullOrEmpty } from "../common/utils";
 import { LogLevel, LogMessage, setLog } from "../core/logger";
 import TurnChess, { ITurnChess } from "../models/turnChess.model";
 
@@ -99,13 +99,17 @@ export const createPlayer = setFunctionName(
       if (!baseController.validateContentType(request, response, createPlayer.name)) {
         return;
       }
+
       const fields = [
         { key: "character", type: "integer" },
         { key: "player", type: "string" },
         { key: "score", type: "integer" },
         { key: "spentTime", type: "string" },
-        { key: "message", type: "string" }
       ];
+      const message = request.body.message;
+      if (!isNullOrEmpty(message)) {
+        fields.push({ key: "message", type: "string" });
+      }
       if (!baseController.validateBodyFields(request, response, createPlayer.name, fields)) {
         return;
       }

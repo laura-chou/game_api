@@ -55,7 +55,7 @@ export const MOCK_NEW_EXTRA_PLAYER: IRawDataItem = {
   player: "newPlayer2",
   score: 10,
   spentTime: "15:47",
-  message: "New extra player!"
+  message: ""
 };
 
 export const MOCK_FORMATTED_DATA: IFormattedDataItem[] = [
