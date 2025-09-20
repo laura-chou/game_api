@@ -10,6 +10,7 @@ export interface ITurnChess {
   player: string;
   score: number;
   spentTime: string;
+  message: string;
   date: Date;
 }
 
@@ -29,6 +30,9 @@ const turnChessSchema = new Schema<ITurnChess>({
   spentTime: {
     type: String,
     required: true
+  },
+  message: {
+    type: String
   },
   date: {
     type: Date,
