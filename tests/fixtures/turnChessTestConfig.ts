@@ -1,3 +1,5 @@
+import { IPlayerFormattedData } from "../../src/controllers/turnChess.controller";
+
 const base = "/turn-chess";
 
 export const ROUTE = {
@@ -12,19 +14,6 @@ type IRawDataItem = {
   score: number;
   spentTime: string;
   message: string;
-}
-
-interface IFormattedPlayer {
-  character: number;
-  player: string;
-  score: number;
-  message: string;
-}
-
-interface IFormattedDataItem {
-  rank: number;
-  spentTime: string;
-  players: IFormattedPlayer[];
 }
 
 export const MOCK_RAW_DATA: IRawDataItem[] = [
@@ -58,7 +47,7 @@ export const MOCK_NEW_EXTRA_PLAYER: IRawDataItem = {
   message: ""
 };
 
-export const MOCK_FORMATTED_DATA: IFormattedDataItem[] = [
+export const MOCK_FORMATTED_DATA: IPlayerFormattedData[] = [
   { 
     rank: 1,
     spentTime: "10:00",
@@ -187,4 +176,4 @@ export const MOCK_FORMATTED_DATA: IFormattedDataItem[] = [
   }
 ];
 
-export const MOCK_FORMATTED_TOP5: IFormattedDataItem[] = MOCK_FORMATTED_DATA.slice(0, 5);
+export const MOCK_FORMATTED_TOP5: IPlayerFormattedData[] = MOCK_FORMATTED_DATA.slice(0, 5);

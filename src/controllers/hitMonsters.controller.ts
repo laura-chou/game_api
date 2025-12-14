@@ -3,45 +3,52 @@ import { Request, Response } from "express";
 import { responseHandler } from "../common/response";
 import { getNowDate, setFunctionName } from "../common/utils";
 import { LogLevel, LogMessage, setLog } from "../core/logger";
-import RescueMoney, { IRescueMoney } from "../models/rescueMoney.model";
+import HitMonsters, { IHitMonsters } from "../models/hitMonsters.model";
 
 import * as baseController from "./base.controller";
 
 export interface IPlayerFormattedData {
   rank: number;
-  money: string;
+  spentTime: string;
   players: string[];
 }
 
-const getFormattedData = (data: IRescueMoney[]): IPlayerFormattedData[] => {
+const getFormattedData = (data: IHitMonsters[]): IPlayerFormattedData[] => {
   const groupData = new Map<string, Set<string>>();
 
-  for (const { money, player } of data) {
-    if (!money || !player) continue;
-    if (!groupData.has(money)) groupData.set(money, new Set());
-    const playerSet = groupData.get(money);
-    if (playerSet) {
-      playerSet.add(player);
+  for (const { spentTime, player } of data) {
+    if (!spentTime || !player) continue;
+
+    if (!groupData.has(spentTime)) {
+      groupData.set(spentTime, new Set());
     }
+
+    groupData.get(spentTime)?.add(player);
   }
-  
-  return Array.from(groupData.entries())
-    .map(([money, players]) => ({
-      money,
-      players: Array.from(players)
+
+  return [...groupData.entries()]
+    .map(([spentTime, players]) => ({
+      spentTime,
+      players: [...players]
     }))
-    .sort((a, b) => parseFloat(b.money) - parseFloat(a.money))
+    .sort((a, b) => {
+      const toMinutes = (t: string): number => {
+        const [h, m] = t.split(":").map(Number);
+        return h * 60 + m;
+      };
+      return toMinutes(a.spentTime) - toMinutes(b.spentTime);
+    })
     .map((item, index) => ({
-      ...item,
-      rank: index + 1
+      rank: index + 1,
+      ...item
     }));
 };
 
-const getPlayersData = (): Promise<IRescueMoney[]> => {
+const getPlayersData = (): Promise<IHitMonsters[]> => {
   return new Promise((resolve, reject) => {
-    RescueMoney
+    HitMonsters
       .find({}, "-_id -date")
-      .sort({ money: "desc" })
+      .sort({ spentTime: "asc" })
       .lean()
       .then((result) => {
         setLog(LogLevel.INFO, LogMessage.SUCCESS, getPlayersData.name);
@@ -58,10 +65,6 @@ const getPlayersData = (): Promise<IRescueMoney[]> => {
   });
 };
 
-const isPlayerInList = (data: IPlayerFormattedData[], player: string): boolean => {
-  return data.some(item => item.players.includes(player));
-};
-
 export const getPlayers = baseController.createGetPlayersHandler({
   name: "getPlayers",
   getPlayersData,
@@ -75,22 +78,9 @@ export const getTopFive = baseController.createGetPlayersHandler({
   sliceFn: data => data.slice(0, 5),
 });
 
-export const getTotalPlayers = setFunctionName(
-  async(): Promise<number> => {
-    try {
-      const result = await RescueMoney.distinct("player");
-      setLog(LogLevel.INFO, LogMessage.SUCCESS, getTotalPlayers.name);
-      return result.length;
-    } catch (error) {
-      setLog(
-        LogLevel.ERROR,
-        error instanceof Error ? error.message : LogMessage.ERROR.UNKNOWN,
-        getTotalPlayers.name);
-      throw error;
-    }
-  },
-  "getTotalPlayers"
-);
+const isPlayerInList = (data: IPlayerFormattedData[], player: string): boolean => {
+  return data.some(item => item.players.some(p => p === player));
+};
 
 export const createPlayer = setFunctionName(
   async(request: Request, response: Response): Promise<void> => {
@@ -98,9 +88,10 @@ export const createPlayer = setFunctionName(
       if (!baseController.validateContentType(request, response, createPlayer.name)) {
         return;
       }
+
       const fields = [
         { key: "player", type: "string" },
-        { key: "money", type: "string" }
+        { key: "spentTime", type: "string" },
       ];
       if (!baseController.validateBodyFields(request, response, createPlayer.name, fields)) {
         return;
@@ -111,7 +102,7 @@ export const createPlayer = setFunctionName(
         date: getNowDate()
       };
 
-      await RescueMoney.create(data);
+      await HitMonsters.create(data);
 
       setLog(LogLevel.INFO, LogMessage.SUCCESS, createPlayer.name);
 

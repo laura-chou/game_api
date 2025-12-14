@@ -5,22 +5,22 @@ import { Model, model, Schema } from "mongoose";
 import { RESPONSE_MESSAGE } from "../common/constants";
 import { isNullOrEmpty } from "../common/utils";
 
-if (isNullOrEmpty(process.env.COLLECTION_RESCUE_MONEY)) {
+if (isNullOrEmpty(process.env.COLLECTION_HIT_MONSTERS)) {
   throw new Error(RESPONSE_MESSAGE.ENV_ERROR);
 }
 
-export interface IRescueMoney {
+export interface IHitMonsters {
   player: string;
-  money: string;
+  spentTime: string;
   date: Date;
 }
 
-const rescueMoneySchema = new Schema<IRescueMoney>({
+const hitMonstersSchema = new Schema<IHitMonsters>({
   player: {
     type: String,
     required: true
   },
-  money: {
+  spentTime: {
     type: String,
     required: true
   },
@@ -30,11 +30,10 @@ const rescueMoneySchema = new Schema<IRescueMoney>({
   }
 }, {
   versionKey: false,
-  collection: process.env.COLLECTION_RESCUE_MONEY
+  collection: process.env.COLLECTION_HIT_MONSTERS
 });
 
-
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const RescueMoney: Model<IRescueMoney> = model<IRescueMoney>(process.env.COLLECTION_RESCUE_MONEY!, rescueMoneySchema);
+const HitMonsters: Model<IHitMonsters> = model(process.env.COLLECTION_HIT_MONSTERS!, hitMonstersSchema);
 
-export default RescueMoney;
+export default HitMonsters;

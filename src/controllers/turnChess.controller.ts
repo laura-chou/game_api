@@ -14,7 +14,7 @@ interface IPlayer {
   score: number;
 }
 
-interface IPlayerFormattedData {
+export interface IPlayerFormattedData {
   rank: number;
   spentTime: string;
   players: IPlayer[];
@@ -45,9 +45,11 @@ const getFormattedData = (data: ITurnChess[]): IPlayerFormattedData[] => {
       })
     }))
     .sort((a, b) => {
-      const [hoursA, minutesA] = a.spentTime.split(":").map(Number);
-      const [hoursB, minutesB] = b.spentTime.split(":").map(Number);
-      return (hoursA * 60 + minutesA) - (hoursB * 60 + minutesB);
+      const toMinutes = (t: string): number => {
+        const [h, m] = t.split(":").map(Number);
+        return h * 60 + m;
+      };
+      return toMinutes(a.spentTime) - toMinutes(b.spentTime);
     })
     .map((item, index) => ({
       ...item,
