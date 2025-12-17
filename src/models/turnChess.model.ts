@@ -5,6 +5,10 @@ import { Model, model, Schema } from "mongoose";
 import { RESPONSE_MESSAGE } from "../common/constants";
 import { isNullOrEmpty } from "../common/utils";
 
+if (isNullOrEmpty(process.env.COLLECTION_TURN_CHESS)) {
+  throw new Error(RESPONSE_MESSAGE.ENV_ERROR);
+}
+
 export interface ITurnChess {
   character: number;
   player: string;
@@ -42,10 +46,6 @@ const turnChessSchema = new Schema<ITurnChess>({
   versionKey: false,
   collection: process.env.COLLECTION_TURN_CHESS
 });
-
-if (isNullOrEmpty(process.env.COLLECTION_TURN_CHESS)) {
-  throw new Error(RESPONSE_MESSAGE.ENV_ERROR);
-}
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const TurnChess: Model<ITurnChess> = model(process.env.COLLECTION_TURN_CHESS!, turnChessSchema);

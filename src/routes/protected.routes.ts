@@ -1,4 +1,5 @@
 
+import { hitMonstersRoutes } from "./hitMonsters.route";
 import { indexRoute } from "./index.route";
 import { jackpotRoutes } from "./jackpot.route";
 import { rescueMoneyRoutes } from "./rescueMoney.route";
@@ -9,7 +10,8 @@ const protectedRoutes: Array<RouteConfig> = [
   indexRoute(),
   rescueMoneyRoutes(),
   jackpotRoutes(),
-  turnChessRoutes()
+  turnChessRoutes(),
+  hitMonstersRoutes()
 ];
 
 export default protectedRoutes;
