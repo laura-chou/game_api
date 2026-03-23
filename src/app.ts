@@ -2,6 +2,8 @@ import "dotenv/config";
 import cors, { CorsOptions } from "cors";
 import express, { json, urlencoded, Express, Request, Response, NextFunction } from "express";
 import morgan, { token } from "morgan";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 
 import { isJestTest, isNullOrEmpty } from "../src/common/utils";
 import { connectDB } from "../src/core/db";
@@ -11,6 +13,27 @@ import protectedRoutes from "../src/routes/protected.routes";
 import { responseHandler } from "./common/response";
 
 const app: Express = express();
+
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "77play-system-api",
+      version: "init one version",
+      description: "This is about 77play system api description document.",
+    },
+    servers: [
+      {
+        url: `http://localhost:${process.env.PORT || 3000}`,
+      },
+    ],
+  },
+  apis: ["./src/routes/*.ts"],
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 const whiteList: string[] = process.env.WHITELIST?.split(",") || [];
 const loggedOrigins = new Set<string>();
 
