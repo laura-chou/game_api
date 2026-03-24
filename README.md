@@ -1,3 +1,3 @@
 # Game Api
-### Apiary
-#### https://gamesapi5.docs.apiary.io/
+### Swagger
+#### https://app.swaggerhub.com/apis-docs/private-412/game-api
